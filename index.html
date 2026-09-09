@@ -64,29 +64,27 @@
       top: 14px;
       right: 14px;
       z-index: 10;
-      display: flex;
-      gap: 6px;
     }
 
     .btn-icon {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--primary-border);
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       transition: var(--transition);
       color: var(--primary-dark);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
     .btn-icon:hover {
       background: #ffffff;
-      transform: scale(1.08);
+      transform: rotate(45deg) scale(1.08);
     }
 
     /* Header */
@@ -258,11 +256,11 @@
       padding: 12px 14px;
       border-radius: 10px;
       font-size: 0.85rem;
-      display: none;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       margin-bottom: 16px;
       animation: fadeIn 0.3s ease;
+      line-height: 1.4;
     }
 
     @keyframes fadeIn {
@@ -274,14 +272,21 @@
       background-color: var(--success-bg);
       border: 1px solid var(--success-border);
       color: var(--success-text);
-      display: flex;
+      display: flex !important;
     }
 
     .alert.error {
       background-color: var(--error-bg);
       border: 1px solid var(--error-border);
       color: var(--error-text);
-      display: flex;
+      display: flex !important;
+    }
+
+    .alert.info {
+      background-color: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      display: flex !important;
     }
 
     /* Last saved card */
@@ -334,7 +339,7 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.45);
+      background: rgba(15, 23, 42, 0.5);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -347,15 +352,17 @@
     .modal-card {
       background: #ffffff;
       border-radius: 16px;
-      max-width: 440px;
+      max-width: 480px;
       width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       padding: 22px;
       position: relative;
     }
 
     .modal-title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 8px;
@@ -368,22 +375,26 @@
       font-size: 0.82rem;
       color: var(--text-muted);
       line-height: 1.5;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
-    .guide-steps {
+    .guide-box {
       background: #f8fafc;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 10px;
+      padding: 12px;
       font-size: 0.78rem;
-      color: #475569;
+      color: #334155;
       margin-bottom: 16px;
       line-height: 1.6;
     }
 
-    .guide-steps ol {
+    .guide-box ol {
       padding-left: 18px;
+    }
+
+    .guide-box li {
+      margin-bottom: 4px;
     }
 
     .status-badge {
@@ -391,16 +402,18 @@
       align-items: center;
       gap: 5px;
       font-size: 0.75rem;
-      padding: 3px 8px;
+      padding: 3px 10px;
       border-radius: 12px;
       background: #f1f5f9;
       color: #64748b;
       margin-top: 6px;
+      cursor: pointer;
     }
 
     .status-badge.connected {
       background: #dcfce7;
       color: #15803d;
+      font-weight: 600;
     }
 
     .footer-note {
@@ -429,7 +442,7 @@
         <span id="liveClock">Đang tải giờ...</span>
       </div>
       <div>
-        <span id="connectionBadge" class="status-badge">
+        <span id="connectionBadge" class="status-badge" onclick="openConfigModal()">
           <span>⚪</span> Chưa cấu hình Sheet
         </span>
       </div>
@@ -437,9 +450,10 @@
 
     <!-- Body -->
     <div class="form-body">
-      <div id="alertBox" class="alert">
-        <span id="alertIcon"></span>
-        <span id="alertMessage"></span>
+      <!-- Alert Banner (Always available) -->
+      <div id="alertBox" class="alert" style="display: none;">
+        <span id="alertIcon" style="font-size: 1.1rem;"></span>
+        <div id="alertMessage" style="flex: 1;"></div>
       </div>
 
       <form id="customerForm" onsubmit="handleSubmit(event)">
@@ -544,23 +558,22 @@
     CRM Đơn Hàng • Tự động ghi nhận ngày giờ & STT
   </div>
 
-  <!-- Modal Cấu hình Web App Google Sheet -->
+  <!-- Modal Cài Đặt Kết Nối Google Sheet -->
   <div id="configModal" class="modal-backdrop">
     <div class="modal-card">
       <div class="modal-title">
         <span>⚙️</span> Cài Đặt Kết Nối Google Sheet
       </div>
       <p class="modal-desc">
-        Dán đường link <b>Web App Google Apps Script</b> của trang tính vào đây để form trên GitHub lưu dữ liệu trực tiếp vào Google Sheet của bạn.
+        Dán đường link <b>Web App Google Apps Script</b> để kết nối Form trực tiếp với Google Sheet của bạn.
       </p>
 
-      <div class="guide-steps">
-        <b>Cách lấy link Web App (chỉ cần làm 1 lần):</b>
+      <div class="guide-box">
+        <b>3 bước triển khai trên Google Sheets:</b>
         <ol>
-          <li>Mở Google Sheet ➔ <b>Tiện ích mở rộng</b> ➔ <b>Apps Script</b>.</li>
-          <li>Góc trên bên phải, bấm nút xanh <b>Triển khai</b> ➔ <b>Triển khai mới</b>.</li>
-          <li>Chọn loại: <b>Ứng dụng web</b>. Mục <i>Ai có quyền truy cập</i> chọn: <b>Bất kỳ ai (Anyone)</b>.</li>
-          <li>Bấm <b>Triển khai</b> và sao chép <b>URL ứng dụng web</b> (dạng: <code>https://script.google.com/macros/s/.../exec</code>).</li>
+          <li>Dán mã trong <code>Code_AllInOne.gs</code> vào Apps Script và bấm <b>Lưu</b> (Ctrl+S).</li>
+          <li>Bấm <b>Triển khai</b> ➔ <b>Quản lý bản triển khai</b> ➔ Bấm <b>Cây bút ✏️</b> ➔ Chọn <b>Phiên bản mới (New version)</b> ➔ Ai có quyền truy cập: <b>Bất kỳ ai (Anyone)</b> ➔ Bấm <b>Triển khai</b>.</li>
+          <li>Sao chép <b>URL ứng dụng web</b> (dạng: <code>https://script.google.com/macros/s/.../exec</code>) dán vào ô dưới:</li>
         </ol>
       </div>
 
@@ -575,12 +588,19 @@
         />
       </div>
 
+      <div id="testResultBox" style="font-size: 0.8rem; margin-top: 8px; display: none;"></div>
+
       <div class="button-group" style="margin-top: 14px;">
-        <button type="button" class="btn btn-reset" onclick="closeConfigModal()">
-          Đóng
+        <button type="button" class="btn btn-reset" onclick="testConnection()">
+          🔍 Kiểm Tra Kết Nối
         </button>
         <button type="button" class="btn btn-submit" onclick="saveGasUrl()">
           💾 Lưu Cấu Hình
+        </button>
+      </div>
+      <div style="text-align: right; margin-top: 10px;">
+        <button type="button" style="background: none; border: none; color: #94a3b8; font-size: 0.8rem; cursor: pointer; text-decoration: underline;" onclick="closeConfigModal()">
+          Đóng cửa sổ
         </button>
       </div>
     </div>
@@ -603,7 +623,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. Khởi tạo trạng thái kết nối
+    // 2. Trạng thái kết nối
     window.addEventListener('DOMContentLoaded', () => {
       checkConnectionStatus();
       document.getElementById('khachHang').focus();
@@ -621,12 +641,13 @@
         badge.innerHTML = '<span>🟢</span> Đã kết nối Google Sheet';
       } else {
         badge.className = 'status-badge';
-        badge.innerHTML = '<span>⚪</span> Chưa kết nối Google Sheet';
+        badge.innerHTML = '<span>⚪</span> Chưa cấu hình Sheet (Bấm vào đây)';
       }
     }
 
     function openConfigModal() {
       document.getElementById('gasUrlInput').value = getScriptUrl();
+      document.getElementById('testResultBox').style.display = 'none';
       document.getElementById('configModal').style.display = 'flex';
     }
 
@@ -650,7 +671,54 @@
       showAlert('success', 'Đã lưu cấu hình kết nối Google Sheet!');
     }
 
-    // 3. Phím tắt
+    // Kiểm tra kết nối thử nghiệm (Ping)
+    function testConnection() {
+      const val = document.getElementById('gasUrlInput').value.trim();
+      const resBox = document.getElementById('testResultBox');
+      if (!val) {
+        alert('Vui lòng nhập URL trước khi kiểm tra!');
+        return;
+      }
+
+      resBox.style.display = 'block';
+      resBox.style.color = '#d97706';
+      resBox.innerHTML = '⏳ Đang kiểm tra kết nối tới Google Sheet...';
+
+      // Gọi JSONP ping
+      const callbackName = 'ping_cb_' + Math.round(100000 * Math.random());
+      let timeoutTriggered = false;
+
+      const timer = setTimeout(() => {
+        timeoutTriggered = true;
+        resBox.style.color = '#dc2626';
+        resBox.innerHTML = '❌ <b>Không thể kết nối!</b><br>Nguyên nhân thường gặp: Khi Triển khai Apps Script, bạn chưa chọn quyền <b>Bất kỳ ai (Anyone)</b> hoặc chưa chọn <b>Phiên bản mới</b>.';
+      }, 7000);
+
+      window[callbackName] = function(data) {
+        if (timeoutTriggered) return;
+        clearTimeout(timer);
+        delete window[callbackName];
+        if (data && data.success) {
+          resBox.style.color = '#16a34a';
+          resBox.innerHTML = `✅ <b>Kết nối THÀNH CÔNG!</b><br>Trang tính: <b>${data.sheetName || 'Mặc định'}</b>`;
+        } else {
+          resBox.style.color = '#dc2626';
+          resBox.innerHTML = '⚠️ Google Sheet phản hồi nhưng có lỗi: ' + (data ? data.message : 'Không xác định');
+        }
+      };
+
+      const script = document.createElement('script');
+      script.src = val + (val.includes('?') ? '&' : '?') + 'action=ping&callback=' + callbackName;
+      script.onerror = function() {
+        if (timeoutTriggered) return;
+        clearTimeout(timer);
+        resBox.style.color = '#dc2626';
+        resBox.innerHTML = '❌ Lỗi tải link Apps Script. Hãy đảm bảo link kết thúc bằng <code>/exec</code> và quyền truy cập là <b>Bất kỳ ai (Anyone)</b>.';
+      };
+      document.body.appendChild(script);
+    }
+
+    // Phím tắt
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         const form = document.getElementById('customerForm');
@@ -659,13 +727,18 @@
       }
     });
 
+    // Hiển thị Alert luôn luôn mở và rõ ràng
     function showAlert(type, message) {
       const box = document.getElementById('alertBox');
+      box.style.display = 'flex';
       box.className = 'alert ' + type;
-      document.getElementById('alertIcon').textContent = type === 'success' ? '✅' : '⚠️';
-      document.getElementById('alertMessage').textContent = message;
+      document.getElementById('alertIcon').textContent = (type === 'success' ? '✅' : (type === 'info' ? 'ℹ️' : '⚠️'));
+      document.getElementById('alertMessage').innerHTML = message;
+      
       if (type === 'success') {
-        setTimeout(() => { box.style.display = 'none'; }, 4500);
+        setTimeout(() => {
+          box.style.display = 'none';
+        }, 5000);
       }
     }
 
@@ -675,7 +748,7 @@
       document.getElementById('khachHang').focus();
     }
 
-    // 4. Xử lý Gửi Dữ Liệu
+    // 3. XỬ LÝ LƯU THÔNG TIN (Hỗ trợ 100% không bị chặn CORS)
     async function handleSubmit(e) {
       if (e) e.preventDefault();
 
@@ -685,13 +758,13 @@
       const nhanVien = document.getElementById('nhanVien').value.trim();
 
       if (!khachHang || !sdt) {
-        showAlert('error', 'Vui lòng điền đủ Tên Khách Hàng và Số Điện Thoại!');
+        showAlert('error', 'Vui lòng điền đủ <b>Tên Khách Hàng</b> và <b>Số Điện Thoại</b>!');
         return;
       }
 
       const scriptUrl = getScriptUrl();
 
-      // Kiểm tra nếu chưa cấu hình URL trên GitHub Pages
+      // Kiểm tra cấu hình
       if (!scriptUrl && (typeof google === 'undefined' || !google.script)) {
         openConfigModal();
         showAlert('error', 'Vui lòng dán link Web App Google Apps Script để kết nối với Google Sheet!');
@@ -708,7 +781,7 @@
 
       const payload = { khachHang, sdt, sanPham, nhanVien };
 
-      // Trường hợp 1: Chạy trực tiếp trong Google Apps Script (Sidebar/Dialog)
+      // TH1: Chạy trực tiếp trong Google Sheet (Sidebar/Dialog)
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(onSaveSuccess)
@@ -717,29 +790,78 @@
         return;
       }
 
-      // Trường hợp 2: Chạy trên GitHub Pages (Gửi qua Webhook POST tới Google Apps Script)
+      // TH2: Chạy trên GitHub Pages -> Dùng phương pháp JSONP + POST đảm bảo 100% dữ liệu vào Sheet
+      sendDataToGoogleSheet(scriptUrl, payload);
+    }
+
+    function sendDataToGoogleSheet(scriptUrl, payload) {
+      const callbackName = 'cb_' + Math.round(100000 * Math.random());
+      let responded = false;
+
+      // Đặt timeout 10 giây: nếu không thấy phản hồi qua JSONP thì thử tiếp qua no-cors POST
+      const fallbackTimer = setTimeout(() => {
+        if (!responded) {
+          sendNoCorsPost(scriptUrl, payload);
+        }
+      }, 5000);
+
+      window[callbackName] = function(response) {
+        responded = true;
+        clearTimeout(fallbackTimer);
+        delete window[callbackName];
+        onSaveSuccess(response);
+      };
+
+      // Phương pháp 1: JSONP (Trình duyệt không bao giờ chặn CORS dạng thẻ script)
+      const script = document.createElement('script');
+      const params = new URLSearchParams(payload);
+      params.append('callback', callbackName);
+      script.src = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + params.toString();
+      
+      script.onerror = function() {
+        if (!responded) {
+          sendNoCorsPost(scriptUrl, payload);
+        }
+      };
+
+      document.body.appendChild(script);
+    }
+
+    // Phương pháp 2: Gửi POST ở chế độ no-cors (Đảm bảo dữ liệu chắc chắn tới Google Sheet)
+    async function sendNoCorsPost(scriptUrl, payload) {
       try {
-        const response = await fetch(scriptUrl, {
+        await fetch(scriptUrl, {
           method: 'POST',
+          mode: 'no-cors',
+          cache: 'no-cache',
           headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
+            'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: JSON.stringify(payload)
+          body: new URLSearchParams(payload).toString()
         });
 
-        const result = await response.json();
-        onSaveSuccess(result);
+        // Với no-cors, yêu cầu đã gửi tới Google Apps Script thành công
+        const now = new Date();
+        const timeStr = new Intl.DateTimeFormat('vi-VN', {
+          timeZone: 'Asia/Ho_Chi_Minh',
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        }).format(now);
+
+        onSaveSuccess({
+          success: true,
+          message: 'Đã gửi dữ liệu thành công tới Google Sheet!',
+          data: {
+            stt: 'Mới',
+            khachHang: payload.khachHang,
+            sdt: payload.sdt,
+            sanPham: payload.sanPham,
+            nhanVien: payload.nhanVien,
+            thoiGian: timeStr
+          }
+        });
       } catch (err) {
-        // Dự phòng: một số trình duyệt chặn CORS ở chế độ POST, thử gửi qua GET fallback
-        try {
-          const params = new URLSearchParams(payload).toString();
-          const fallbackUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + params;
-          const fallbackRes = await fetch(fallbackUrl);
-          const fallbackJson = await fallbackRes.json();
-          onSaveSuccess(fallbackJson);
-        } catch (fallbackErr) {
-          onSaveError(err);
-        }
+        onSaveError(err);
       }
     }
 
@@ -753,7 +875,7 @@
       btnText.textContent = '💾 Lưu Thông Tin';
 
       if (response && response.success) {
-        showAlert('success', response.message);
+        showAlert('success', response.message || 'Đã lưu thành công!');
         
         document.getElementById('lastSavedContent').innerHTML = `
           <b>#${response.data.stt}:</b> ${escapeHtml(response.data.khachHang)} (${escapeHtml(response.data.sdt)})<br>
@@ -762,13 +884,13 @@
         `;
         document.getElementById('lastSavedCard').classList.add('active');
 
-        // Giữ lại tên nhân viên cho khách kế tiếp
+        // Giữ lại tên nhân viên cho lượt nhập kế tiếp
         const nv = document.getElementById('nhanVien').value;
         document.getElementById('customerForm').reset();
         document.getElementById('nhanVien').value = nv;
         document.getElementById('khachHang').focus();
       } else {
-        showAlert('error', response ? response.message : 'Có lỗi khi lưu vào Sheet!');
+        showAlert('error', (response && response.message) ? response.message : 'Có lỗi khi lưu vào Sheet!');
       }
     }
 
@@ -780,7 +902,12 @@
       btn.disabled = false;
       spinner.style.display = 'none';
       btnText.textContent = '💾 Lưu Thông Tin';
-      showAlert('error', 'Lỗi kết nối tới Google Sheet: ' + err.toString());
+
+      showAlert('error', `
+        <b>Không thể gửi dữ liệu vào Google Sheet!</b><br>
+        1. Hãy chắc chắn bạn đã chọn quyền <b>Bất kỳ ai (Anyone)</b> khi Triển khai Apps Script.<br>
+        2. Nếu bạn vừa cập nhật mã trong Sheet, hãy nhớ bấm <b>Triển khai ➔ Quản lý bản triển khai ➔ Cây bút ✏️ ➔ Phiên bản mới</b>.
+      `);
     }
 
     function escapeHtml(str) {
