@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Nhập Thông Tin Khách Hàng - CRM Đơn Hàng</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,11 +61,6 @@
       position: relative;
     }
 
-    /* Ẩn hoàn toàn nút bánh răng */
-    .top-actions {
-      display: none !important;
-    }
-
     /* Header */
     .form-header {
       background: linear-gradient(135deg, #fdf7ec 0%, #fae8c4 100%);
@@ -82,7 +80,6 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      cursor: default;
     }
 
     .live-clock-badge {
@@ -308,7 +305,7 @@
       color: var(--text-muted);
     }
 
-    /* Dòng 'Xem kết quả' mở trang tính */
+    /* Dòng 'Xem kết quả' mở trực tiếp trang tính */
     .view-result-box {
       text-align: center;
       margin-top: 16px;
@@ -320,12 +317,12 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      padding: 9px 18px;
+      padding: 10px 20px;
       background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
       color: #15803d;
       border: 1.5px solid #86efac;
       border-radius: 30px;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       font-weight: 700;
       text-decoration: none;
       cursor: pointer;
@@ -404,28 +401,6 @@
       margin-top: 8px;
     }
 
-    /* Modal Cài Đặt Ẩn */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.5);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      z-index: 1000;
-    }
-
-    .modal-card {
-      background: #ffffff;
-      border-radius: 16px;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      padding: 22px;
-    }
-
     .footer-note {
       text-align: center;
       margin-top: 14px;
@@ -437,8 +412,9 @@
 <body>
 
   <div class="form-container">
+    <!-- Header -->
     <div class="form-header">
-      <h2 title="Nhấp đúp để cài đặt kết nối" ondblclick="openConfigModal()">
+      <h2>
         <span>📋</span> Nhập Dữ Liệu Khách Hàng
       </h2>
       <div class="live-clock-badge">
@@ -543,9 +519,15 @@
           Mẹo: Nhấn <b>Enter</b> hoặc <b>Ctrl + Enter</b> để lưu nhanh
         </div>
 
-        <!-- DÒNG "XEM KẾT QUẢ" MỞ TRANG TÍNH GOOGLE SHEETS -->
+        <!-- DÒNG "XEM KẾT QUẢ" MỞ TRỰC TIẾP TRANG TÍNH GOOGLE SHEETS -->
         <div class="view-result-box">
-          <a href="javascript:void(0)" class="view-result-btn" onclick="openGoogleSheet(event)" title="Mở trang tính Google Sheets trong tab mới">
+          <a 
+            href="https://docs.google.com/spreadsheets/d/1u11ohuoigi8lTEqtD8c_FI3oqHOlW4uGtBuwEbwu7zQ/edit?usp=sharing" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="view-result-btn" 
+            title="Mở trang tính Google Sheets trong tab mới"
+          >
             <span>📊</span> Xem Kết Quả (Trang Tính) <span style="font-size: 0.85rem;">↗</span>
           </a>
         </div>
@@ -570,53 +552,14 @@
     </div>
   </div>
 
-  <!-- Modal Cài Đặt Kết Nối (Ẩn - Nhấp đúp tiêu đề để mở) -->
-  <div id="configModal" class="modal-backdrop">
-    <div class="modal-card">
-      <h3 style="margin-bottom: 8px; color: #1e293b;">⚙️ Cài Đặt Link Google Sheet</h3>
-      <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">
-        1. URL Web App Google Apps Script:
-      </p>
-      <input 
-        type="url" 
-        id="gasUrlInput" 
-        class="form-control" 
-        style="padding-left: 12px; margin-bottom: 12px;" 
-        placeholder="https://script.google.com/macros/s/.../exec"
-      />
-      <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">
-        2. Link Trang Tính Google Sheets (để mở khi bấm "Xem kết quả"):
-      </p>
-      <input 
-        type="url" 
-        id="sheetDirectUrlInput" 
-        class="form-control" 
-        style="padding-left: 12px; margin-bottom: 14px;" 
-        placeholder="https://docs.google.com/spreadsheets/d/.../edit"
-      />
-      <div class="button-group">
-        <button type="button" class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
-        <button type="button" class="btn btn-submit" onclick="saveGasUrl()">💾 Lưu Cấu Hình</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     // =========================================================================
-    // CẤU HÌNH CỐ ĐỊNH CHO TẤT CẢ MỌI TRÌNH DUYỆT & MỌI NGƯỜI DÙNG
-    // Khi điền link vào đây, bất kỳ ai mở web ở bất cứ đâu đều chạy ngay,
-    // KHÔNG BAO GIỜ bị hỏi nhập lại link nữa!
+    // ĐƯỜNG LINK CỐ ĐỊNH CHÍNH XÁC 100% CỦA BẠN (KHÔNG BAO GIỜ BỊ HỎI LINK NỮA)
     // =========================================================================
-    const APP_CONFIG = {
-      // URL Web App Google Apps Script:
-      SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbygdVOPLaAmO6Cu5NXaIqiTa09p45gboIyakug_wWHc8L2fJz-HL3MhJOMOq7I13rOOWQ/exec',
-      // Link Trang tính Google Sheets:
-      SHEET_URL: 'https://docs.google.com/spreadsheets/d/1u11ohuoigi8lTEqtD8c_FI3oqHOlW4uGtBuwEbwu7zQ/edit?usp=sharing'
-    };
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbygdVOPLaAmO6Cu5NXaIqiTa09p45gboIyakug_wWHc8L2fJz-HL3MhJOMOq7I13rOOWQ/exec';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1u11ohuoigi8lTEqtD8c_FI3oqHOlW4uGtBuwEbwu7zQ/edit?usp=sharing';
 
-    const STORAGE_KEY = 'crm_donhang_gas_url';
     const STAFF_STORAGE_KEY = 'crm_staff_list';
-    const SHEET_DIRECT_KEY = 'crm_sheet_direct_url';
     let staffList = [];
     let toastTimer = null;
 
@@ -645,84 +588,19 @@
       document.getElementById('khachHang').focus();
     });
 
-    // Phím tắt mở cài đặt: Ctrl + Shift + S
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
-        openConfigModal();
-      }
-    });
-
-    // Lấy URL Web App (ưu tiên APP_CONFIG cố định, nếu trống mới lấy localStorage)
-    function getScriptUrl() {
-      return (APP_CONFIG.SCRIPT_URL && APP_CONFIG.SCRIPT_URL.trim()) 
-          || localStorage.getItem(STORAGE_KEY) 
-          || '';
-    }
-
-    // Lấy URL Trang Tính (ưu tiên APP_CONFIG cố định, nếu trống mới lấy localStorage)
-    function getSheetDirectUrl() {
-      return (APP_CONFIG.SHEET_URL && APP_CONFIG.SHEET_URL.trim()) 
-          || localStorage.getItem(SHEET_DIRECT_KEY) 
-          || '';
-    }
-
-    // Mở trang tính Google Sheets khi bấm "Xem kết quả"
-    function openGoogleSheet(e) {
-      if (e) e.preventDefault();
-      let url = getSheetDirectUrl();
-      if (url && url.startsWith('http')) {
-        window.open(url, '_blank');
-        return;
-      }
-
-      // Nếu chưa cấu hình cố định trong code và chưa lưu máy, mở popup cài đặt
-      openConfigModal();
-    }
-
-    function openConfigModal() {
-      document.getElementById('gasUrlInput').value = getScriptUrl();
-      document.getElementById('sheetDirectUrlInput').value = getSheetDirectUrl();
-      document.getElementById('configModal').style.display = 'flex';
-    }
-
-    function closeConfigModal() {
-      document.getElementById('configModal').style.display = 'none';
-    }
-
-    function saveGasUrl() {
-      const val = document.getElementById('gasUrlInput').value.trim();
-      const directUrl = document.getElementById('sheetDirectUrlInput').value.trim();
-
-      if (!val) { alert('Vui lòng nhập URL Web App!'); return; }
-      localStorage.setItem(STORAGE_KEY, val);
-      if (directUrl) localStorage.setItem(SHEET_DIRECT_KEY, directUrl);
-
-      closeConfigModal();
-      showCenterToast('Đã lưu cấu hình kết nối!');
-      fetchStaffList();
-    }
-
-    // Tải danh sách nhân viên từ tab "ds nhân viên" và tự động lấy link Google Sheet
+    // Tải danh sách nhân viên từ tab "ds nhân viên"
     function fetchStaffList() {
-      const scriptUrl = getScriptUrl();
-      if (!scriptUrl) return;
-
       const callbackName = 'staff_cb_' + Math.round(100000 * Math.random());
       window[callbackName] = function(res) {
         delete window[callbackName];
-        if (res) {
-          if (res.sheetUrl && !getSheetDirectUrl()) {
-            localStorage.setItem(SHEET_DIRECT_KEY, res.sheetUrl);
-          }
-          if (res.success && res.staff) {
-            staffList = res.staff;
-            try { localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList)); } catch(e) {}
-          }
+        if (res && res.success && res.staff) {
+          staffList = res.staff;
+          try { localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList)); } catch(e) {}
         }
       };
 
       const script = document.createElement('script');
-      script.src = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=getStaff&callback=' + callbackName;
+      script.src = SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + 'action=getStaff&callback=' + callbackName;
       document.body.appendChild(script);
     }
 
@@ -764,7 +642,6 @@
         div.className = 'suggestion-item';
         div.innerHTML = `
           <span><b>${escapeHtml(item.name)}</b></span>
-          ${item.user ? `<span class="suggestion-user-badge">${escapeHtml(item.user)}</span>` : ''}
         `;
         div.onmousedown = function(e) {
           e.preventDefault();
@@ -842,7 +719,7 @@
       document.getElementById('khachHang').focus();
     }
 
-    // Xử lý Lưu Thông Tin siêu tốc
+    // Xử lý Lưu Thông Tin siêu tốc trực tiếp tới SCRIPT_URL
     async function handleSubmit(e) {
       if (e) e.preventDefault();
 
@@ -863,13 +740,6 @@
         }
       }
 
-      const scriptUrl = getScriptUrl();
-      if (!scriptUrl) {
-        openConfigModal();
-        alert('Vui lòng cài đặt link Web App Google Apps Script!');
-        return;
-      }
-
       const btn = document.getElementById('btnSubmit');
       const spinner = document.getElementById('btnSpinner');
       const btnText = document.getElementById('btnText');
@@ -881,7 +751,7 @@
       const payload = { khachHang, sdt, sanPham, nhanVien };
 
       try {
-        await fetch(scriptUrl, {
+        await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
           cache: 'no-cache',
