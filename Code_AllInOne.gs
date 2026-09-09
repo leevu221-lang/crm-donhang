@@ -2,6 +2,7 @@
  * =========================================================================================
  * BẢN TẤT CẢ TRONG 1 (ALL-IN-ONE): GOOGLE APPS SCRIPT FORM NHẬP LIỆU KHÁCH HÀNG KÈM NGÀY GIỜ
  * HỖ TRỢ: CHẠY TRỰC TIẾP TRONG GOOGLE SHEETS + KẾT NỐI VỚI GITHUB PAGES (JSONP & POST)
+ * TÍNH NĂNG MỚI: TỰ ĐỘNG GỢI Ý TÊN TỪ USER TRONG TAB "DS NHÂN VIÊN"
  * =========================================================================================
  */
 
@@ -57,13 +58,19 @@ function doGet(e) {
     return createJsonResponse(pingResult, e.parameter.callback);
   }
 
-  // 2. Nhận dữ liệu gửi qua GET / JSONP từ GitHub Pages
+  // 2. Lấy danh sách nhân viên từ tab "ds nhân viên" để gợi ý
+  if (e && e.parameter && e.parameter.action === "getStaff") {
+    const staffResult = getStaffList();
+    return createJsonResponse(staffResult, e.parameter.callback);
+  }
+
+  // 3. Nhận dữ liệu gửi qua GET / JSONP từ GitHub Pages
   if (e && e.parameter && (e.parameter.khachHang || e.parameter.sdt)) {
     const result = saveCustomerData(e.parameter);
     return createJsonResponse(result, e.parameter.callback);
   }
 
-  // 3. Mở giao diện Web App trực tiếp
+  // 4. Mở giao diện Web App trực tiếp
   return HtmlService.createHtmlOutput(getFormHtml())
     .setTitle("Form Nhập Liệu Khách Hàng")
     .addMetaTag("viewport", "width=device-width, initial-scale=1.0")
@@ -109,6 +116,72 @@ function doPost(e) {
 }
 
 /**
+ * Đọc danh sách nhân viên từ tab "ds nhân viên"
+ */
+function getStaffList() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheets = ss.getSheets();
+    let staffSheet = null;
+
+    // Tìm sheet có tên chứa "ds nhân viên" hoặc "nhân viên"
+    for (let s of sheets) {
+      const sName = s.getName().trim().toLowerCase();
+      if (sName === "ds nhân viên" || sName === "ds nhan vien" || sName.includes("nhân viên") || sName.includes("nhan vien")) {
+        staffSheet = s;
+        break;
+      }
+    }
+
+    if (!staffSheet) {
+      return { success: false, staff: [], message: "Chưa tìm thấy trang tính 'ds nhân viên'" };
+    }
+
+    const lastRow = staffSheet.getLastRow();
+    if (lastRow <= 1) {
+      return { success: true, staff: [] };
+    }
+
+    const lastCol = Math.max(staffSheet.getLastColumn(), 2);
+    const data = staffSheet.getRange(1, 1, lastRow, lastCol).getValues();
+
+    // Xác định cột User và cột Tên
+    let userColIdx = 0;
+    let nameColIdx = 1;
+
+    if (data.length > 0) {
+      const h0 = (data[0][0] || "").toString().toLowerCase();
+      const h1 = (data[0][1] || "").toString().toLowerCase();
+      if (h0.includes("tên") || h0.includes("họ")) {
+        nameColIdx = 0;
+        userColIdx = 1;
+      }
+    }
+
+    const staff = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const valUser = (row[userColIdx] !== undefined && row[userColIdx] !== null) ? row[userColIdx].toString().trim() : "";
+      const valName = (row[nameColIdx] !== undefined && row[nameColIdx] !== null) ? row[nameColIdx].toString().trim() : "";
+
+      if (valUser || valName) {
+        const userCode = valUser;
+        const fullName = valName || valUser;
+        staff.push({
+          user: userCode,
+          name: fullName,
+          label: (userCode && userCode !== fullName) ? `${userCode} - ${fullName}` : fullName
+        });
+      }
+    }
+
+    return { success: true, staff: staff };
+  } catch (err) {
+    return { success: false, staff: [], message: err.toString() };
+  }
+}
+
+/**
  * Tạo phản hồi JSON hỗ trợ cả JSONP (tránh 100% lỗi CORS trình duyệt)
  */
 function createJsonResponse(dataObj, callbackName) {
@@ -150,7 +223,7 @@ function saveCustomerData(data) {
     if (SHEET_NAME && SHEET_NAME.trim() !== "") {
       sheet = ss.getSheetByName(SHEET_NAME.trim());
     } else {
-      // Luôn lấy trang tính đầu tiên để tránh lỗi khi gọi từ Web
+      // Lấy trang tính đầu tiên làm nơi lưu dữ liệu
       sheet = ss.getSheets()[0];
     }
 
@@ -216,5 +289,5 @@ function saveCustomerData(data) {
 }
 
 function getFormHtml() {
-  return "<p>Vui lòng sử dụng giao diện trên GitHub Pages hoặc tệp index.html</p>";
+  return "<p>Vui lòng sử dụng giao diện trên GitHub Pages</p>";
 }

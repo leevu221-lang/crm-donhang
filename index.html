@@ -58,7 +58,7 @@
       position: relative;
     }
 
-    /* Top bar buttons (Config / Settings) */
+    /* Top bar: Settings Gear Button */
     .top-actions {
       position: absolute;
       top: 14px;
@@ -144,6 +144,7 @@
 
     .form-group {
       margin-bottom: 16px;
+      position: relative;
     }
 
     .form-label {
@@ -171,6 +172,7 @@
       color: #94a3b8;
       font-size: 1rem;
       pointer-events: none;
+      z-index: 2;
     }
 
     .form-control {
@@ -194,6 +196,62 @@
       resize: vertical;
       min-height: 70px;
       padding-top: 10px;
+    }
+
+    /* Staff Suggestion Dropdown */
+    .suggestions-box {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid var(--primary-border);
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 50;
+      display: none;
+      margin-top: 4px;
+    }
+
+    .suggestion-item {
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: var(--transition);
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover, .suggestion-item.active {
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .suggestion-user-badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .staff-match-note {
+      font-size: 0.76rem;
+      color: #059669;
+      font-weight: 600;
+      margin-top: 4px;
+      display: none;
+      align-items: center;
+      gap: 4px;
     }
 
     /* Buttons */
@@ -282,38 +340,6 @@
       display: flex !important;
     }
 
-    .alert.info {
-      background-color: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
-      display: flex !important;
-    }
-
-    /* Last saved card */
-    .last-saved-card {
-      margin-top: 18px;
-      padding: 12px 14px;
-      background: #fafaf9;
-      border: 1px dashed #d6d3d1;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      display: none;
-    }
-
-    .last-saved-card.active {
-      display: block;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .last-saved-title {
-      font-weight: 700;
-      color: #78350f;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
     .spinner {
       width: 16px;
       height: 16px;
@@ -393,29 +419,6 @@
       padding-left: 18px;
     }
 
-    .guide-box li {
-      margin-bottom: 4px;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.75rem;
-      padding: 3px 10px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      color: #64748b;
-      margin-top: 6px;
-      cursor: pointer;
-    }
-
-    .status-badge.connected {
-      background: #dcfce7;
-      color: #15803d;
-      font-weight: 600;
-    }
-
     .footer-note {
       text-align: center;
       margin-top: 14px;
@@ -434,30 +437,25 @@
       </button>
     </div>
 
-    <!-- Header -->
+    <!-- Header (Đã ẩn dòng trạng thái kết nối) -->
     <div class="form-header">
       <h2><span>📋</span> Nhập Dữ Liệu Khách Hàng</h2>
       <div class="live-clock-badge">
         <span class="live-dot"></span>
         <span id="liveClock">Đang tải giờ...</span>
       </div>
-      <div>
-        <span id="connectionBadge" class="status-badge" onclick="openConfigModal()">
-          <span>⚪</span> Chưa cấu hình Sheet
-        </span>
-      </div>
     </div>
 
     <!-- Body -->
     <div class="form-body">
-      <!-- Alert Banner (Always available) -->
+      <!-- Alert Banner -->
       <div id="alertBox" class="alert" style="display: none;">
         <span id="alertIcon" style="font-size: 1.1rem;"></span>
         <div id="alertMessage" style="flex: 1;"></div>
       </div>
 
       <form id="customerForm" onsubmit="handleSubmit(event)">
-        <!-- Khách hàng -->
+        <!-- 1. Khách hàng -->
         <div class="form-group">
           <label class="form-label" for="khachHang">
             Khách Hàng <span class="req">*</span>
@@ -475,7 +473,7 @@
           </div>
         </div>
 
-        <!-- SĐT -->
+        <!-- 2. SĐT -->
         <div class="form-group">
           <label class="form-label" for="sdt">
             Số Điện Thoại <span class="req">*</span>
@@ -495,7 +493,7 @@
           </div>
         </div>
 
-        <!-- Sản phẩm khách xem -->
+        <!-- 3. Sản phẩm khách xem -->
         <div class="form-group">
           <label class="form-label" for="sanPham">
             Sản Phẩm Khách Xem
@@ -511,7 +509,7 @@
           </div>
         </div>
 
-        <!-- Nhân viên -->
+        <!-- 4. Nhân viên phụ trách (Có gợi ý tên từ tab 'ds nhân viên') -->
         <div class="form-group">
           <label class="form-label" for="nhanVien">
             Nhân Viên Phụ Trách
@@ -522,9 +520,18 @@
               type="text" 
               id="nhanVien" 
               class="form-control" 
-              placeholder="VD: Lan Anh" 
+              placeholder="Nhập User/Mã NV hoặc Tên (VD: 38834)" 
               autocomplete="off"
+              oninput="handleStaffInput(this.value)"
+              onfocus="handleStaffFocus()"
+              onblur="handleStaffBlur()"
             />
+          </div>
+          <!-- Gợi ý danh sách nhân viên -->
+          <div id="staffSuggestions" class="suggestions-box"></div>
+          <!-- Ghi chú khi khớp nhân viên -->
+          <div id="staffMatchNote" class="staff-match-note">
+            <span>👤</span> <span id="staffMatchText"></span>
           </div>
         </div>
 
@@ -543,14 +550,6 @@
           Mẹo: Nhấn <b>Enter</b> hoặc <b>Ctrl + Enter</b> để lưu nhanh
         </div>
       </form>
-
-      <!-- Last Saved Summary -->
-      <div id="lastSavedCard" class="last-saved-card">
-        <div class="last-saved-title">
-          <span>✅</span> Vừa lưu thành công vào Sheet:
-        </div>
-        <div id="lastSavedContent"></div>
-      </div>
     </div>
   </div>
 
@@ -565,14 +564,14 @@
         <span>⚙️</span> Cài Đặt Kết Nối Google Sheet
       </div>
       <p class="modal-desc">
-        Dán đường link <b>Web App Google Apps Script</b> để kết nối Form trực tiếp với Google Sheet của bạn.
+        Dán link <b>Web App Google Apps Script</b> để kết nối Form trực tiếp với Google Sheet của bạn.
       </p>
 
       <div class="guide-box">
         <b>3 bước triển khai trên Google Sheets:</b>
         <ol>
           <li>Dán mã trong <code>Code_AllInOne.gs</code> vào Apps Script và bấm <b>Lưu</b> (Ctrl+S).</li>
-          <li>Bấm <b>Triển khai</b> ➔ <b>Quản lý bản triển khai</b> ➔ Bấm <b>Cây bút ✏️</b> ➔ Chọn <b>Phiên bản mới (New version)</b> ➔ Ai có quyền truy cập: <b>Bất kỳ ai (Anyone)</b> ➔ Bấm <b>Triển khai</b>.</li>
+          <li>Bấm <b>Triển khai</b> ➔ <b>Quản lý bản triển khai</b> ➔ Bấm <b>Cây bút ✏️</b> ➔ Chọn <b>Phiên bản mới</b> ➔ Quyền truy cập: <b>Bất kỳ ai (Anyone)</b> ➔ Bấm <b>Triển khai</b>.</li>
           <li>Sao chép <b>URL ứng dụng web</b> (dạng: <code>https://script.google.com/macros/s/.../exec</code>) dán vào ô dưới:</li>
         </ol>
       </div>
@@ -608,6 +607,8 @@
 
   <script>
     const STORAGE_KEY = 'crm_donhang_gas_url';
+    const STAFF_STORAGE_KEY = 'crm_staff_list';
+    let staffList = [];
 
     // 1. Đồng hồ thời gian thực
     function updateClock() {
@@ -623,26 +624,24 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. Trạng thái kết nối
+    // 2. Khởi tạo trang và tải danh sách nhân viên
     window.addEventListener('DOMContentLoaded', () => {
-      checkConnectionStatus();
+      // Đọc danh sách nhân viên đã lưu trong cache nếu có
+      try {
+        const cachedStaff = localStorage.getItem(STAFF_STORAGE_KEY);
+        if (cachedStaff) {
+          staffList = JSON.parse(cachedStaff);
+        }
+      } catch (e) {}
+
+      // Tải danh sách nhân viên mới nhất từ Sheet
+      fetchStaffList();
+
       document.getElementById('khachHang').focus();
     });
 
     function getScriptUrl() {
       return localStorage.getItem(STORAGE_KEY) || '';
-    }
-
-    function checkConnectionStatus() {
-      const url = getScriptUrl();
-      const badge = document.getElementById('connectionBadge');
-      if (url && url.includes('script.google.com')) {
-        badge.className = 'status-badge connected';
-        badge.innerHTML = '<span>🟢</span> Đã kết nối Google Sheet';
-      } else {
-        badge.className = 'status-badge';
-        badge.innerHTML = '<span>⚪</span> Chưa cấu hình Sheet (Bấm vào đây)';
-      }
     }
 
     function openConfigModal() {
@@ -666,12 +665,115 @@
         return;
       }
       localStorage.setItem(STORAGE_KEY, val);
-      checkConnectionStatus();
       closeConfigModal();
       showAlert('success', 'Đã lưu cấu hình kết nối Google Sheet!');
+      fetchStaffList(); // Tải lại nhân viên với link mới
     }
 
-    // Kiểm tra kết nối thử nghiệm (Ping)
+    // Tải danh sách nhân viên từ tab "ds nhân viên"
+    function fetchStaffList() {
+      const scriptUrl = getScriptUrl();
+      if (!scriptUrl) return;
+
+      const callbackName = 'staff_cb_' + Math.round(100000 * Math.random());
+      window[callbackName] = function(res) {
+        delete window[callbackName];
+        if (res && res.success && res.staff) {
+          staffList = res.staff;
+          try {
+            localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
+          } catch(e) {}
+        }
+      };
+
+      const script = document.createElement('script');
+      script.src = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + 'action=getStaff&callback=' + callbackName;
+      document.body.appendChild(script);
+    }
+
+    // Xử lý gợi ý Nhân Viên khi người dùng nhập
+    function handleStaffInput(val) {
+      const q = val.trim().toLowerCase();
+      const box = document.getElementById('staffSuggestions');
+      const noteBox = document.getElementById('staffMatchNote');
+      const noteText = document.getElementById('staffMatchText');
+
+      if (!q) {
+        box.style.display = 'none';
+        noteBox.style.display = 'none';
+        return;
+      }
+
+      // Tìm kiếm theo user hoặc theo tên
+      const matches = staffList.filter(s => {
+        const u = (s.user || '').toLowerCase();
+        const n = (s.name || '').toLowerCase();
+        return u.includes(q) || n.includes(q);
+      });
+
+      // Kiểm tra nếu nhập chính xác mã User
+      const exactMatch = staffList.find(s => (s.user || '').toLowerCase() === q);
+      if (exactMatch) {
+        noteBox.style.display = 'flex';
+        noteText.textContent = `Khớp nhân viên: ${exactMatch.name} (${exactMatch.user})`;
+      } else {
+        noteBox.style.display = 'none';
+      }
+
+      if (matches.length === 0) {
+        box.style.display = 'none';
+        return;
+      }
+
+      box.innerHTML = '';
+      matches.slice(0, 6).forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        div.innerHTML = `
+          <span><b>${escapeHtml(item.name)}</b></span>
+          ${item.user ? `<span class="suggestion-user-badge">${escapeHtml(item.user)}</span>` : ''}
+        `;
+        div.onmousedown = function(e) {
+          e.preventDefault(); // Tránh mất focus
+          selectStaff(item);
+        };
+        box.appendChild(div);
+      });
+      box.style.display = 'block';
+    }
+
+    function handleStaffFocus() {
+      const val = document.getElementById('nhanVien').value;
+      if (val) handleStaffInput(val);
+    }
+
+    function handleStaffBlur() {
+      // Đợi click suggestion xong mới ẩn
+      setTimeout(() => {
+        document.getElementById('staffSuggestions').style.display = 'none';
+        // Nếu đã nhập đúng mã user thì tự động điền tên
+        const val = document.getElementById('nhanVien').value.trim().toLowerCase();
+        if (val) {
+          const exact = staffList.find(s => (s.user || '').toLowerCase() === val);
+          if (exact) {
+            document.getElementById('nhanVien').value = exact.name;
+            const noteBox = document.getElementById('staffMatchNote');
+            noteBox.style.display = 'flex';
+            document.getElementById('staffMatchText').textContent = `Khớp mã user: ${exact.user}`;
+          }
+        }
+      }, 200);
+    }
+
+    function selectStaff(item) {
+      document.getElementById('nhanVien').value = item.name;
+      document.getElementById('staffSuggestions').style.display = 'none';
+      const noteBox = document.getElementById('staffMatchNote');
+      noteBox.style.display = 'flex';
+      document.getElementById('staffMatchText').textContent = `Khớp nhân viên: ${item.name} (${item.user || ''})`;
+    }
+
+    // Kiểm tra kết nối
     function testConnection() {
       const val = document.getElementById('gasUrlInput').value.trim();
       const resBox = document.getElementById('testResultBox');
@@ -684,14 +786,13 @@
       resBox.style.color = '#d97706';
       resBox.innerHTML = '⏳ Đang kiểm tra kết nối tới Google Sheet...';
 
-      // Gọi JSONP ping
       const callbackName = 'ping_cb_' + Math.round(100000 * Math.random());
       let timeoutTriggered = false;
 
       const timer = setTimeout(() => {
         timeoutTriggered = true;
         resBox.style.color = '#dc2626';
-        resBox.innerHTML = '❌ <b>Không thể kết nối!</b><br>Nguyên nhân thường gặp: Khi Triển khai Apps Script, bạn chưa chọn quyền <b>Bất kỳ ai (Anyone)</b> hoặc chưa chọn <b>Phiên bản mới</b>.';
+        resBox.innerHTML = '❌ <b>Không thể kết nối!</b> Vui lòng kiểm tra quyền "Bất kỳ ai (Anyone)" hoặc chọn "Phiên bản mới".';
       }, 7000);
 
       window[callbackName] = function(data) {
@@ -703,18 +804,12 @@
           resBox.innerHTML = `✅ <b>Kết nối THÀNH CÔNG!</b><br>Trang tính: <b>${data.sheetName || 'Mặc định'}</b>`;
         } else {
           resBox.style.color = '#dc2626';
-          resBox.innerHTML = '⚠️ Google Sheet phản hồi nhưng có lỗi: ' + (data ? data.message : 'Không xác định');
+          resBox.innerHTML = '⚠️ Có lỗi: ' + (data ? data.message : 'Không xác định');
         }
       };
 
       const script = document.createElement('script');
       script.src = val + (val.includes('?') ? '&' : '?') + 'action=ping&callback=' + callbackName;
-      script.onerror = function() {
-        if (timeoutTriggered) return;
-        clearTimeout(timer);
-        resBox.style.color = '#dc2626';
-        resBox.innerHTML = '❌ Lỗi tải link Apps Script. Hãy đảm bảo link kết thúc bằng <code>/exec</code> và quyền truy cập là <b>Bất kỳ ai (Anyone)</b>.';
-      };
       document.body.appendChild(script);
     }
 
@@ -727,12 +822,12 @@
       }
     });
 
-    // Hiển thị Alert luôn luôn mở và rõ ràng
+    // Alert
     function showAlert(type, message) {
       const box = document.getElementById('alertBox');
       box.style.display = 'flex';
       box.className = 'alert ' + type;
-      document.getElementById('alertIcon').textContent = (type === 'success' ? '✅' : (type === 'info' ? 'ℹ️' : '⚠️'));
+      document.getElementById('alertIcon').textContent = (type === 'success' ? '✅' : '⚠️');
       document.getElementById('alertMessage').innerHTML = message;
       
       if (type === 'success') {
@@ -742,29 +837,39 @@
       }
     }
 
+    // Reset tất cả các ô về trống
     function resetForm() {
       document.getElementById('customerForm').reset();
       document.getElementById('alertBox').style.display = 'none';
+      document.getElementById('staffSuggestions').style.display = 'none';
+      document.getElementById('staffMatchNote').style.display = 'none';
       document.getElementById('khachHang').focus();
     }
 
-    // 3. XỬ LÝ LƯU THÔNG TIN (Hỗ trợ 100% không bị chặn CORS)
+    // 3. XỬ LÝ LƯU THÔNG TIN
     async function handleSubmit(e) {
       if (e) e.preventDefault();
 
       const khachHang = document.getElementById('khachHang').value.trim();
       const sdt = document.getElementById('sdt').value.trim();
       const sanPham = document.getElementById('sanPham').value.trim();
-      const nhanVien = document.getElementById('nhanVien').value.trim();
+      let nhanVien = document.getElementById('nhanVien').value.trim();
 
       if (!khachHang || !sdt) {
         showAlert('error', 'Vui lòng điền đủ <b>Tên Khách Hàng</b> và <b>Số Điện Thoại</b>!');
         return;
       }
 
+      // Nếu nhân viên đang là mã user, chuyển thành tên nhân viên tương ứng nếu tìm thấy
+      if (nhanVien) {
+        const match = staffList.find(s => (s.user || '').toLowerCase() === nhanVien.toLowerCase());
+        if (match && match.name) {
+          nhanVien = match.name;
+        }
+      }
+
       const scriptUrl = getScriptUrl();
 
-      // Kiểm tra cấu hình
       if (!scriptUrl && (typeof google === 'undefined' || !google.script)) {
         openConfigModal();
         showAlert('error', 'Vui lòng dán link Web App Google Apps Script để kết nối với Google Sheet!');
@@ -781,7 +886,7 @@
 
       const payload = { khachHang, sdt, sanPham, nhanVien };
 
-      // TH1: Chạy trực tiếp trong Google Sheet (Sidebar/Dialog)
+      // Chạy trực tiếp trong Google Sheet (Sidebar/Dialog)
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(onSaveSuccess)
@@ -790,7 +895,7 @@
         return;
       }
 
-      // TH2: Chạy trên GitHub Pages -> Dùng phương pháp JSONP + POST đảm bảo 100% dữ liệu vào Sheet
+      // Chạy trên GitHub Pages
       sendDataToGoogleSheet(scriptUrl, payload);
     }
 
@@ -798,7 +903,6 @@
       const callbackName = 'cb_' + Math.round(100000 * Math.random());
       let responded = false;
 
-      // Đặt timeout 10 giây: nếu không thấy phản hồi qua JSONP thì thử tiếp qua no-cors POST
       const fallbackTimer = setTimeout(() => {
         if (!responded) {
           sendNoCorsPost(scriptUrl, payload);
@@ -812,7 +916,6 @@
         onSaveSuccess(response);
       };
 
-      // Phương pháp 1: JSONP (Trình duyệt không bao giờ chặn CORS dạng thẻ script)
       const script = document.createElement('script');
       const params = new URLSearchParams(payload);
       params.append('callback', callbackName);
@@ -827,7 +930,6 @@
       document.body.appendChild(script);
     }
 
-    // Phương pháp 2: Gửi POST ở chế độ no-cors (Đảm bảo dữ liệu chắc chắn tới Google Sheet)
     async function sendNoCorsPost(scriptUrl, payload) {
       try {
         await fetch(scriptUrl, {
@@ -840,31 +942,16 @@
           body: new URLSearchParams(payload).toString()
         });
 
-        // Với no-cors, yêu cầu đã gửi tới Google Apps Script thành công
-        const now = new Date();
-        const timeStr = new Intl.DateTimeFormat('vi-VN', {
-          timeZone: 'Asia/Ho_Chi_Minh',
-          day: '2-digit', month: '2-digit', year: 'numeric',
-          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-        }).format(now);
-
         onSaveSuccess({
           success: true,
-          message: 'Đã gửi dữ liệu thành công tới Google Sheet!',
-          data: {
-            stt: 'Mới',
-            khachHang: payload.khachHang,
-            sdt: payload.sdt,
-            sanPham: payload.sanPham,
-            nhanVien: payload.nhanVien,
-            thoiGian: timeStr
-          }
+          message: 'Đã lưu thành công thông tin vào Google Sheet!'
         });
       } catch (err) {
         onSaveError(err);
       }
     }
 
+    // Khi lưu thành công: Hiện thông báo và reset sạch tất cả các ô thành trống
     function onSaveSuccess(response) {
       const btn = document.getElementById('btnSubmit');
       const spinner = document.getElementById('btnSpinner');
@@ -875,19 +962,15 @@
       btnText.textContent = '💾 Lưu Thông Tin';
 
       if (response && response.success) {
-        showAlert('success', response.message || 'Đã lưu thành công!');
+        // 1. Chỉ hiện thông báo đã lưu xong
+        showAlert('success', response.message || 'Đã lưu thành công vào Google Sheet!');
         
-        document.getElementById('lastSavedContent').innerHTML = `
-          <b>#${response.data.stt}:</b> ${escapeHtml(response.data.khachHang)} (${escapeHtml(response.data.sdt)})<br>
-          <b>Sản phẩm:</b> ${escapeHtml(response.data.sanPham || '---')} | <b>Nhân viên:</b> ${escapeHtml(response.data.nhanVien || '---')}<br>
-          <i>🕒 ${response.data.thoiGian}</i>
-        `;
-        document.getElementById('lastSavedCard').classList.add('active');
-
-        // Giữ lại tên nhân viên cho lượt nhập kế tiếp
-        const nv = document.getElementById('nhanVien').value;
+        // 2. Reset tất cả các ô thành trống theo đúng yêu cầu
         document.getElementById('customerForm').reset();
-        document.getElementById('nhanVien').value = nv;
+        document.getElementById('staffSuggestions').style.display = 'none';
+        document.getElementById('staffMatchNote').style.display = 'none';
+
+        // 3. Tự động focus về ô Khách Hàng để nhập khách tiếp theo
         document.getElementById('khachHang').focus();
       } else {
         showAlert('error', (response && response.message) ? response.message : 'Có lỗi khi lưu vào Sheet!');
@@ -905,8 +988,7 @@
 
       showAlert('error', `
         <b>Không thể gửi dữ liệu vào Google Sheet!</b><br>
-        1. Hãy chắc chắn bạn đã chọn quyền <b>Bất kỳ ai (Anyone)</b> khi Triển khai Apps Script.<br>
-        2. Nếu bạn vừa cập nhật mã trong Sheet, hãy nhớ bấm <b>Triển khai ➔ Quản lý bản triển khai ➔ Cây bút ✏️ ➔ Phiên bản mới</b>.
+        Vui lòng kiểm tra lại link Web App trong phần cài đặt (bánh răng ⚙️).
       `);
     }
 
