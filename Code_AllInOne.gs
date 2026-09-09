@@ -1,8 +1,7 @@
 /**
  * =========================================================================================
  * BẢN TẤT CẢ TRONG 1 (ALL-IN-ONE): GOOGLE APPS SCRIPT FORM NHẬP LIỆU KHÁCH HÀNG KÈM NGÀY GIỜ
- * HỖ TRỢ: CHẠY TRỰC TIẾP TRONG GOOGLE SHEETS + KẾT NỐI VỚI GITHUB PAGES (JSONP & POST)
- * TÍNH NĂNG MỚI: TỰ ĐỘNG GỢI Ý TÊN TỪ USER TRONG TAB "DS NHÂN VIÊN"
+ * TỐI ƯU TỐC ĐỘ LƯU CỰC NHANH (SIÊU TỐC) + GỢI Ý NHÂN VIÊN TỪ TAB "DS NHÂN VIÊN"
  * =========================================================================================
  */
 
@@ -22,9 +21,6 @@ function onOpen() {
     .addToUi();
 }
 
-/**
- * Hiển thị Sidebar bên phải trang tính
- */
 function showSidebar() {
   const html = HtmlService.createHtmlOutput(getFormHtml())
     .setTitle("Nhập Thông Tin Khách Hàng")
@@ -32,9 +28,6 @@ function showSidebar() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
-/**
- * Hiển thị Hộp thoại Popup ở giữa trang tính
- */
 function showModalDialog() {
   const html = HtmlService.createHtmlOutput(getFormHtml())
     .setWidth(460)
@@ -64,7 +57,7 @@ function doGet(e) {
     return createJsonResponse(staffResult, e.parameter.callback);
   }
 
-  // 3. Nhận dữ liệu gửi qua GET / JSONP từ GitHub Pages
+  // 3. Nhận dữ liệu gửi qua GET từ GitHub Pages (nếu có)
   if (e && e.parameter && (e.parameter.khachHang || e.parameter.sdt)) {
     const result = saveCustomerData(e.parameter);
     return createJsonResponse(result, e.parameter.callback);
@@ -78,19 +71,9 @@ function doGet(e) {
 }
 
 /**
- * Xử lý yêu cầu POST từ GitHub Pages (nhận cả form-data và json)
+ * Xử lý yêu cầu POST từ GitHub Pages (nhận cả form-data và json) - Tối ưu siêu tốc
  */
 function doPost(e) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      message: "Hệ thống đang bận, vui lòng thử lại sau vài giây!"
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-
   try {
     let data = {};
     if (e.parameter && (e.parameter.khachHang || e.parameter.sdt)) {
@@ -108,10 +91,8 @@ function doPost(e) {
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
-      message: "Lỗi server Apps Script: " + error.toString()
+      message: "Lỗi: " + error.toString()
     })).setMimeType(ContentService.MimeType.JSON);
-  } finally {
-    lock.releaseLock();
   }
 }
 
@@ -124,7 +105,6 @@ function getStaffList() {
     const sheets = ss.getSheets();
     let staffSheet = null;
 
-    // Tìm sheet có tên chứa "ds nhân viên" hoặc "nhân viên"
     for (let s of sheets) {
       const sName = s.getName().trim().toLowerCase();
       if (sName === "ds nhân viên" || sName === "ds nhan vien" || sName.includes("nhân viên") || sName.includes("nhan vien")) {
@@ -145,7 +125,6 @@ function getStaffList() {
     const lastCol = Math.max(staffSheet.getLastColumn(), 2);
     const data = staffSheet.getRange(1, 1, lastRow, lastCol).getValues();
 
-    // Xác định cột User và cột Tên
     let userColIdx = 0;
     let nameColIdx = 1;
 
@@ -182,7 +161,7 @@ function getStaffList() {
 }
 
 /**
- * Tạo phản hồi JSON hỗ trợ cả JSONP (tránh 100% lỗi CORS trình duyệt)
+ * Tạo phản hồi JSON hỗ trợ cả JSONP
  */
 function createJsonResponse(dataObj, callbackName) {
   const jsonStr = JSON.stringify(dataObj);
@@ -198,93 +177,49 @@ function showHelp() {
   const ui = SpreadsheetApp.getUi();
   ui.alert(
     "HƯỚNG DẪN SỬ DỤNG",
-    "1. Bấm 'Mở Form Nhập Liệu' để mở form.\n" +
-    "2. Nhập đầy đủ thông tin Khách hàng, SĐT, Sản phẩm và Nhân viên.\n" +
-    "3. Bấm 'Lưu Thông Tin', hệ thống tự động tăng STT và lưu ngày giờ chính xác.\n" +
-    "4. Số điện thoại được giữ nguyên số 0 ở đầu.",
+    "1. Nhập thông tin Khách hàng, SĐT, Sản phẩm và Nhân viên.\n" +
+    "2. Bấm 'Lưu Thông Tin' để lưu vào trang tính kèm STT và ngày giờ.\n" +
+    "3. Số điện thoại được giữ nguyên số 0 ở đầu.",
     ui.ButtonSet.OK
   );
 }
 
 /**
- * Hàm ghi dữ liệu vào Google Sheet
+ * Hàm ghi dữ liệu vào Google Sheet - Tối ưu 1 lệnh RPC duy nhất
  */
 function saveCustomerData(data) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-  } catch (e) {
-    return { success: false, message: "Hệ thống đang bận, vui lòng thử lại sau giây lát!" };
-  }
-
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet;
-    if (SHEET_NAME && SHEET_NAME.trim() !== "") {
-      sheet = ss.getSheetByName(SHEET_NAME.trim());
-    } else {
-      // Lấy trang tính đầu tiên làm nơi lưu dữ liệu
-      sheet = ss.getSheets()[0];
-    }
-
+    const sheet = (SHEET_NAME && SHEET_NAME.trim() !== "") ? ss.getSheetByName(SHEET_NAME.trim()) : ss.getSheets()[0];
     if (!sheet) return { success: false, message: "Không tìm thấy trang tính phù hợp!" };
 
-    // 1. Tự động thêm tiêu đề cột F: NGÀY GIỜ LƯU nếu chưa có
-    const headerF = sheet.getRange(1, 6).getValue();
-    if (!headerF || headerF.toString().trim() === "") {
-      const headerCell = sheet.getRange(1, 6);
-      headerCell.setValue("NGÀY GIỜ LƯU");
-      const sampleCell = sheet.getRange(1, 5);
-      headerCell.setFontWeight("bold")
-                .setBackground(sampleCell.getBackground() || "#fce5cd")
-                .setFontColor(sampleCell.getFontColor() || "#783f04")
-                .setFontFamily(sampleCell.getFontFamily() || "Arial")
-                .setHorizontalAlignment("center")
-                .setVerticalAlignment("middle");
-      sheet.setColumnWidth(6, 175);
-    }
-
-    // 2. Tính STT tự động
+    // 1. Tính STT
     const lastRow = sheet.getLastRow();
     const stt = lastRow >= 1 ? lastRow : 1;
-    const targetRow = lastRow + 1;
 
-    // 3. Lấy thời gian hiện tại chuẩn giờ Việt Nam (GMT+7)
+    // 2. Lấy thời gian hiện tại chuẩn giờ Việt Nam (GMT+7)
     const now = new Date();
     const formattedDate = Utilities.formatDate(now, "Asia/Ho_Chi_Minh", "dd/MM/yyyy HH:mm:ss");
 
-    // 4. Chuẩn hóa dữ liệu
+    // 3. Chuẩn hóa dữ liệu
     const khachHang = (data.khachHang || "").trim();
     const sdtRaw = (data.sdt || "").trim();
     const sdt = sdtRaw.startsWith("'") ? sdtRaw : `'${sdtRaw}`;
     const sanPham = (data.sanPham || "").trim();
     const nhanVien = (data.nhanVien || "").trim();
 
-    // 5. Ghi dòng mới vào Sheet: [STT, KHÁCH HÀNG, SĐT, SẢN PHẨM KHÁCH XEM, NHÂN VIÊN, NGÀY GIỜ LƯU]
-    const rowValues = [stt, khachHang, sdt, sanPham, nhanVien, formattedDate];
-    sheet.appendRow(rowValues);
-
-    sheet.getRange(targetRow, 1).setHorizontalAlignment("center");
-    sheet.getRange(targetRow, 3).setHorizontalAlignment("center");
-    sheet.getRange(targetRow, 6).setHorizontalAlignment("center");
+    // 4. Ghi dòng mới vào Sheet trong 1 cuộc gọi duy nhất
+    sheet.appendRow([stt, khachHang, sdt, sanPham, nhanVien, formattedDate]);
 
     return {
       success: true,
       message: `Đã lưu thành công khách hàng #${stt}: ${khachHang}`,
-      sheetName: sheet.getName(),
-      data: {
-        stt: stt,
-        khachHang: khachHang,
-        sdt: sdtRaw,
-        sanPham: sanPham,
-        nhanVien: nhanVien,
-        thoiGian: formattedDate
-      }
+      stt: stt,
+      khachHang: khachHang,
+      thoiGian: formattedDate
     };
   } catch (error) {
-    return { success: false, message: "Lỗi khi lưu vào trang tính: " + error.toString() };
-  } finally {
-    lock.releaseLock();
+    return { success: false, message: "Lỗi: " + error.toString() };
   }
 }
 

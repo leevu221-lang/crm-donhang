@@ -58,33 +58,9 @@
       position: relative;
     }
 
-    /* Top bar: Settings Gear Button */
+    /* Ẩn hoàn toàn nút bánh răng theo yêu cầu */
     .top-actions {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      z-index: 10;
-    }
-
-    .btn-icon {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid var(--primary-border);
-      border-radius: 50%;
-      width: 34px;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: var(--transition);
-      color: var(--primary-dark);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    .btn-icon:hover {
-      background: #ffffff;
-      transform: rotate(45deg) scale(1.08);
+      display: none !important;
     }
 
     /* Header */
@@ -93,6 +69,7 @@
       padding: 24px 20px 18px;
       border-bottom: 2px solid var(--primary-border);
       text-align: center;
+      user-select: none;
     }
 
     .form-header h2 {
@@ -105,6 +82,7 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
+      cursor: default;
     }
 
     .live-clock-badge {
@@ -309,37 +287,6 @@
       color: #1e293b;
     }
 
-    /* Alert Banner */
-    .alert {
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 16px;
-      animation: fadeIn 0.3s ease;
-      line-height: 1.4;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .alert.success {
-      background-color: var(--success-bg);
-      border: 1px solid var(--success-border);
-      color: var(--success-text);
-      display: flex !important;
-    }
-
-    .alert.error {
-      background-color: var(--error-bg);
-      border: 1px solid var(--error-border);
-      color: var(--error-text);
-      display: flex !important;
-    }
-
     .spinner {
       width: 16px;
       height: 16px;
@@ -361,7 +308,73 @@
       color: var(--text-muted);
     }
 
-    /* Settings Modal */
+    /* ===================================================
+       THÔNG BÁO GIỮA MÀN HÌNH (CENTER TOAST MODAL)
+       =================================================== */
+    .center-toast-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.25);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .center-toast-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .center-toast-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 28px 36px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.15);
+      border: 2px solid #a7f3d0;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      transform: scale(0.85);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .center-toast-overlay.show .center-toast-card {
+      transform: scale(1);
+    }
+
+    .toast-icon {
+      font-size: 3rem;
+      line-height: 1;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: popIcon 0.5s ease;
+    }
+
+    @keyframes popIcon {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .toast-text {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #065f46;
+      line-height: 1.5;
+    }
+
+    .toast-subtext {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 8px;
+    }
+
+    /* Modal Cài Đặt Ẩn (Mở bằng cách nhấp đúp vào Tiêu đề) */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -371,8 +384,7 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
-      z-index: 100;
-      animation: fadeIn 0.2s ease;
+      z-index: 1000;
     }
 
     .modal-card {
@@ -380,43 +392,8 @@
       border-radius: 16px;
       max-width: 480px;
       width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       padding: 22px;
-      position: relative;
-    }
-
-    .modal-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-desc {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 14px;
-    }
-
-    .guide-box {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 0.78rem;
-      color: #334155;
-      margin-bottom: 16px;
-      line-height: 1.6;
-    }
-
-    .guide-box ol {
-      padding-left: 18px;
     }
 
     .footer-note {
@@ -430,30 +407,19 @@
 <body>
 
   <div class="form-container">
-    <!-- Top Action: Settings Button -->
-    <div class="top-actions">
-      <button class="btn-icon" title="Cài đặt kết nối Google Sheet" onclick="openConfigModal()">
-        ⚙️
-      </button>
-    </div>
-
-    <!-- Header (Đã ẩn dòng trạng thái kết nối) -->
+    <!-- Header (Nhấp đúp vào tiêu đề nếu cần cài đặt lại link Sheet) -->
     <div class="form-header">
-      <h2><span>📋</span> Nhập Dữ Liệu Khách Hàng</h2>
+      <h2 title="Nhấp đúp để cài đặt kết nối" ondblclick="openConfigModal()">
+        <span>📋</span> Nhập Dữ Liệu Khách Hàng
+      </h2>
       <div class="live-clock-badge">
         <span class="live-dot"></span>
         <span id="liveClock">Đang tải giờ...</span>
       </div>
     </div>
 
-    <!-- Body -->
+    <!-- Form Body -->
     <div class="form-body">
-      <!-- Alert Banner -->
-      <div id="alertBox" class="alert" style="display: none;">
-        <span id="alertIcon" style="font-size: 1.1rem;"></span>
-        <div id="alertMessage" style="flex: 1;"></div>
-      </div>
-
       <form id="customerForm" onsubmit="handleSubmit(event)">
         <!-- 1. Khách hàng -->
         <div class="form-group">
@@ -535,7 +501,7 @@
           </div>
         </div>
 
-        <!-- Action buttons -->
+        <!-- Nút bấm -->
         <div class="button-group">
           <button type="button" class="btn btn-reset" onclick="resetForm()">
             🔄 Làm Mới
@@ -557,50 +523,38 @@
     CRM Đơn Hàng • Tự động ghi nhận ngày giờ & STT
   </div>
 
-  <!-- Modal Cài Đặt Kết Nối Google Sheet -->
+  <!-- =====================================================
+       THÔNG BÁO HIỆN CHÍNH GIỮA MÀN HÌNH 5 GIÂY RỒI BIẾN MẤT
+       ===================================================== -->
+  <div id="centerToast" class="center-toast-overlay" onclick="hideCenterToast()">
+    <div class="center-toast-card">
+      <div class="toast-icon">✅</div>
+      <div class="toast-text" id="centerToastMessage">
+        Đã lưu thành công!
+      </div>
+      <div class="toast-subtext">
+        (Tự động đóng sau 5 giây hoặc bấm vào để đóng)
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Cài Đặt Kết Nối (Ẩn - Chỉ mở khi nhấp đúp tiêu đề) -->
   <div id="configModal" class="modal-backdrop">
     <div class="modal-card">
-      <div class="modal-title">
-        <span>⚙️</span> Cài Đặt Kết Nối Google Sheet
-      </div>
-      <p class="modal-desc">
-        Dán link <b>Web App Google Apps Script</b> để kết nối Form trực tiếp với Google Sheet của bạn.
+      <h3 style="margin-bottom: 8px; color: #1e293b;">⚙️ Cài Đặt Link Google Sheet</h3>
+      <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">
+        Dán URL Web App Google Apps Script để kết nối:
       </p>
-
-      <div class="guide-box">
-        <b>3 bước triển khai trên Google Sheets:</b>
-        <ol>
-          <li>Dán mã trong <code>Code_AllInOne.gs</code> vào Apps Script và bấm <b>Lưu</b> (Ctrl+S).</li>
-          <li>Bấm <b>Triển khai</b> ➔ <b>Quản lý bản triển khai</b> ➔ Bấm <b>Cây bút ✏️</b> ➔ Chọn <b>Phiên bản mới</b> ➔ Quyền truy cập: <b>Bất kỳ ai (Anyone)</b> ➔ Bấm <b>Triển khai</b>.</li>
-          <li>Sao chép <b>URL ứng dụng web</b> (dạng: <code>https://script.google.com/macros/s/.../exec</code>) dán vào ô dưới:</li>
-        </ol>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="gasUrlInput">URL Web App Google Apps Script:</label>
-        <input 
-          type="url" 
-          id="gasUrlInput" 
-          class="form-control" 
-          style="padding-left: 12px;" 
-          placeholder="https://script.google.com/macros/s/.../exec"
-        />
-      </div>
-
-      <div id="testResultBox" style="font-size: 0.8rem; margin-top: 8px; display: none;"></div>
-
-      <div class="button-group" style="margin-top: 14px;">
-        <button type="button" class="btn btn-reset" onclick="testConnection()">
-          🔍 Kiểm Tra Kết Nối
-        </button>
-        <button type="button" class="btn btn-submit" onclick="saveGasUrl()">
-          💾 Lưu Cấu Hình
-        </button>
-      </div>
-      <div style="text-align: right; margin-top: 10px;">
-        <button type="button" style="background: none; border: none; color: #94a3b8; font-size: 0.8rem; cursor: pointer; text-decoration: underline;" onclick="closeConfigModal()">
-          Đóng cửa sổ
-        </button>
+      <input 
+        type="url" 
+        id="gasUrlInput" 
+        class="form-control" 
+        style="padding-left: 12px; margin-bottom: 12px;" 
+        placeholder="https://script.google.com/macros/s/.../exec"
+      />
+      <div class="button-group">
+        <button type="button" class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
+        <button type="button" class="btn btn-submit" onclick="saveGasUrl()">💾 Lưu Cấu Hình</button>
       </div>
     </div>
   </div>
@@ -609,6 +563,7 @@
     const STORAGE_KEY = 'crm_donhang_gas_url';
     const STAFF_STORAGE_KEY = 'crm_staff_list';
     let staffList = [];
+    let toastTimer = null;
 
     // 1. Đồng hồ thời gian thực
     function updateClock() {
@@ -624,20 +579,22 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 2. Khởi tạo trang và tải danh sách nhân viên
+    // 2. Khởi tạo trang
     window.addEventListener('DOMContentLoaded', () => {
-      // Đọc danh sách nhân viên đã lưu trong cache nếu có
       try {
-        const cachedStaff = localStorage.getItem(STAFF_STORAGE_KEY);
-        if (cachedStaff) {
-          staffList = JSON.parse(cachedStaff);
-        }
+        const cached = localStorage.getItem(STAFF_STORAGE_KEY);
+        if (cached) staffList = JSON.parse(cached);
       } catch (e) {}
 
-      // Tải danh sách nhân viên mới nhất từ Sheet
       fetchStaffList();
-
       document.getElementById('khachHang').focus();
+    });
+
+    // Phím tắt mở cài đặt: Ctrl + Shift + S
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'S' || e.key === 's')) {
+        openConfigModal();
+      }
     });
 
     function getScriptUrl() {
@@ -646,7 +603,6 @@
 
     function openConfigModal() {
       document.getElementById('gasUrlInput').value = getScriptUrl();
-      document.getElementById('testResultBox').style.display = 'none';
       document.getElementById('configModal').style.display = 'flex';
     }
 
@@ -656,18 +612,11 @@
 
     function saveGasUrl() {
       const val = document.getElementById('gasUrlInput').value.trim();
-      if (!val) {
-        alert('Vui lòng nhập đường dẫn URL Web App!');
-        return;
-      }
-      if (!val.startsWith('https://script.google.com/macros/s/')) {
-        alert('Đường dẫn chưa đúng định dạng. Phải bắt đầu bằng: https://script.google.com/macros/s/...');
-        return;
-      }
+      if (!val) { alert('Vui lòng nhập URL Web App!'); return; }
       localStorage.setItem(STORAGE_KEY, val);
       closeConfigModal();
-      showAlert('success', 'Đã lưu cấu hình kết nối Google Sheet!');
-      fetchStaffList(); // Tải lại nhân viên với link mới
+      showCenterToast('Đã lưu cấu hình kết nối Google Sheet!');
+      fetchStaffList();
     }
 
     // Tải danh sách nhân viên từ tab "ds nhân viên"
@@ -680,9 +629,7 @@
         delete window[callbackName];
         if (res && res.success && res.staff) {
           staffList = res.staff;
-          try {
-            localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList));
-          } catch(e) {}
+          try { localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList)); } catch(e) {}
         }
       };
 
@@ -704,14 +651,12 @@
         return;
       }
 
-      // Tìm kiếm theo user hoặc theo tên
       const matches = staffList.filter(s => {
         const u = (s.user || '').toLowerCase();
         const n = (s.name || '').toLowerCase();
         return u.includes(q) || n.includes(q);
       });
 
-      // Kiểm tra nếu nhập chính xác mã User
       const exactMatch = staffList.find(s => (s.user || '').toLowerCase() === q);
       if (exactMatch) {
         noteBox.style.display = 'flex';
@@ -734,7 +679,7 @@
           ${item.user ? `<span class="suggestion-user-badge">${escapeHtml(item.user)}</span>` : ''}
         `;
         div.onmousedown = function(e) {
-          e.preventDefault(); // Tránh mất focus
+          e.preventDefault();
           selectStaff(item);
         };
         box.appendChild(div);
@@ -748,10 +693,8 @@
     }
 
     function handleStaffBlur() {
-      // Đợi click suggestion xong mới ẩn
       setTimeout(() => {
         document.getElementById('staffSuggestions').style.display = 'none';
-        // Nếu đã nhập đúng mã user thì tự động điền tên
         const val = document.getElementById('nhanVien').value.trim().toLowerCase();
         if (val) {
           const exact = staffList.find(s => (s.user || '').toLowerCase() === val);
@@ -773,47 +716,7 @@
       document.getElementById('staffMatchText').textContent = `Khớp nhân viên: ${item.name} (${item.user || ''})`;
     }
 
-    // Kiểm tra kết nối
-    function testConnection() {
-      const val = document.getElementById('gasUrlInput').value.trim();
-      const resBox = document.getElementById('testResultBox');
-      if (!val) {
-        alert('Vui lòng nhập URL trước khi kiểm tra!');
-        return;
-      }
-
-      resBox.style.display = 'block';
-      resBox.style.color = '#d97706';
-      resBox.innerHTML = '⏳ Đang kiểm tra kết nối tới Google Sheet...';
-
-      const callbackName = 'ping_cb_' + Math.round(100000 * Math.random());
-      let timeoutTriggered = false;
-
-      const timer = setTimeout(() => {
-        timeoutTriggered = true;
-        resBox.style.color = '#dc2626';
-        resBox.innerHTML = '❌ <b>Không thể kết nối!</b> Vui lòng kiểm tra quyền "Bất kỳ ai (Anyone)" hoặc chọn "Phiên bản mới".';
-      }, 7000);
-
-      window[callbackName] = function(data) {
-        if (timeoutTriggered) return;
-        clearTimeout(timer);
-        delete window[callbackName];
-        if (data && data.success) {
-          resBox.style.color = '#16a34a';
-          resBox.innerHTML = `✅ <b>Kết nối THÀNH CÔNG!</b><br>Trang tính: <b>${data.sheetName || 'Mặc định'}</b>`;
-        } else {
-          resBox.style.color = '#dc2626';
-          resBox.innerHTML = '⚠️ Có lỗi: ' + (data ? data.message : 'Không xác định');
-        }
-      };
-
-      const script = document.createElement('script');
-      script.src = val + (val.includes('?') ? '&' : '?') + 'action=ping&callback=' + callbackName;
-      document.body.appendChild(script);
-    }
-
-    // Phím tắt
+    // Phím tắt Enter lưu nhanh
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         const form = document.getElementById('customerForm');
@@ -822,31 +725,36 @@
       }
     });
 
-    // Alert
-    function showAlert(type, message) {
-      const box = document.getElementById('alertBox');
-      box.style.display = 'flex';
-      box.className = 'alert ' + type;
-      document.getElementById('alertIcon').textContent = (type === 'success' ? '✅' : '⚠️');
-      document.getElementById('alertMessage').innerHTML = message;
-      
-      if (type === 'success') {
-        setTimeout(() => {
-          box.style.display = 'none';
-        }, 5000);
+    // HIỂN THỊ THÔNG BÁO GIỮA MÀN HÌNH ĐÚNG 5 GIÂY RỒI BIẾN MẤT
+    function showCenterToast(message) {
+      const toast = document.getElementById('centerToast');
+      const msg = document.getElementById('centerToastMessage');
+      msg.innerHTML = message;
+      toast.classList.add('show');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        hideCenterToast();
+      }, 5000); // 5 giây
+    }
+
+    function hideCenterToast() {
+      const toast = document.getElementById('centerToast');
+      toast.classList.remove('show');
+      if (toastTimer) {
+        clearTimeout(toastTimer);
+        toastTimer = null;
       }
     }
 
-    // Reset tất cả các ô về trống
     function resetForm() {
       document.getElementById('customerForm').reset();
-      document.getElementById('alertBox').style.display = 'none';
       document.getElementById('staffSuggestions').style.display = 'none';
       document.getElementById('staffMatchNote').style.display = 'none';
       document.getElementById('khachHang').focus();
     }
 
-    // 3. XỬ LÝ LƯU THÔNG TIN
+    // 3. TỐI ƯU TỐC ĐỘ LƯU DỮ LIỆU SIÊU TỐC (DƯỚI 1 GIÂY)
     async function handleSubmit(e) {
       if (e) e.preventDefault();
 
@@ -856,11 +764,10 @@
       let nhanVien = document.getElementById('nhanVien').value.trim();
 
       if (!khachHang || !sdt) {
-        showAlert('error', 'Vui lòng điền đủ <b>Tên Khách Hàng</b> và <b>Số Điện Thoại</b>!');
+        showCenterToast('⚠️ Vui lòng điền đủ <b>Tên Khách Hàng</b> và <b>Số Điện Thoại</b>!');
         return;
       }
 
-      // Nếu nhân viên đang là mã user, chuyển thành tên nhân viên tương ứng nếu tìm thấy
       if (nhanVien) {
         const match = staffList.find(s => (s.user || '').toLowerCase() === nhanVien.toLowerCase());
         if (match && match.name) {
@@ -869,10 +776,9 @@
       }
 
       const scriptUrl = getScriptUrl();
-
-      if (!scriptUrl && (typeof google === 'undefined' || !google.script)) {
+      if (!scriptUrl) {
         openConfigModal();
-        showAlert('error', 'Vui lòng dán link Web App Google Apps Script để kết nối với Google Sheet!');
+        alert('Vui lòng dán link Web App Google Apps Script để kết nối!');
         return;
       }
 
@@ -882,55 +788,11 @@
 
       btn.disabled = true;
       spinner.style.display = 'inline-block';
-      btnText.textContent = 'Đang lưu vào Sheet...';
+      btnText.textContent = 'Đang lưu...';
 
       const payload = { khachHang, sdt, sanPham, nhanVien };
 
-      // Chạy trực tiếp trong Google Sheet (Sidebar/Dialog)
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(onSaveSuccess)
-          .withFailureHandler(onSaveError)
-          .saveCustomerData(payload);
-        return;
-      }
-
-      // Chạy trên GitHub Pages
-      sendDataToGoogleSheet(scriptUrl, payload);
-    }
-
-    function sendDataToGoogleSheet(scriptUrl, payload) {
-      const callbackName = 'cb_' + Math.round(100000 * Math.random());
-      let responded = false;
-
-      const fallbackTimer = setTimeout(() => {
-        if (!responded) {
-          sendNoCorsPost(scriptUrl, payload);
-        }
-      }, 5000);
-
-      window[callbackName] = function(response) {
-        responded = true;
-        clearTimeout(fallbackTimer);
-        delete window[callbackName];
-        onSaveSuccess(response);
-      };
-
-      const script = document.createElement('script');
-      const params = new URLSearchParams(payload);
-      params.append('callback', callbackName);
-      script.src = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + params.toString();
-      
-      script.onerror = function() {
-        if (!responded) {
-          sendNoCorsPost(scriptUrl, payload);
-        }
-      };
-
-      document.body.appendChild(script);
-    }
-
-    async function sendNoCorsPost(scriptUrl, payload) {
+      // Gửi trực tiếp siêu tốc bằng no-cors POST (thực thi ngay lập tức ~0.4s)
       try {
         await fetch(scriptUrl, {
           method: 'POST',
@@ -942,54 +804,23 @@
           body: new URLSearchParams(payload).toString()
         });
 
-        onSaveSuccess({
-          success: true,
-          message: 'Đã lưu thành công thông tin vào Google Sheet!'
-        });
+        // Hoàn tất lưu
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = '💾 Lưu Thông Tin';
+
+        // 1. Hiện thông báo giữa màn hình đúng 5 giây
+        showCenterToast(`Đã lưu thành công khách hàng:<br><b>${escapeHtml(khachHang)}</b>`);
+
+        // 2. Reset tất cả các ô thành trống ngay lập tức
+        resetForm();
+
       } catch (err) {
-        onSaveError(err);
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = '💾 Lưu Thông Tin';
+        showCenterToast('❌ Lỗi gửi dữ liệu tới Google Sheet!');
       }
-    }
-
-    // Khi lưu thành công: Hiện thông báo và reset sạch tất cả các ô thành trống
-    function onSaveSuccess(response) {
-      const btn = document.getElementById('btnSubmit');
-      const spinner = document.getElementById('btnSpinner');
-      const btnText = document.getElementById('btnText');
-
-      btn.disabled = false;
-      spinner.style.display = 'none';
-      btnText.textContent = '💾 Lưu Thông Tin';
-
-      if (response && response.success) {
-        // 1. Chỉ hiện thông báo đã lưu xong
-        showAlert('success', response.message || 'Đã lưu thành công vào Google Sheet!');
-        
-        // 2. Reset tất cả các ô thành trống theo đúng yêu cầu
-        document.getElementById('customerForm').reset();
-        document.getElementById('staffSuggestions').style.display = 'none';
-        document.getElementById('staffMatchNote').style.display = 'none';
-
-        // 3. Tự động focus về ô Khách Hàng để nhập khách tiếp theo
-        document.getElementById('khachHang').focus();
-      } else {
-        showAlert('error', (response && response.message) ? response.message : 'Có lỗi khi lưu vào Sheet!');
-      }
-    }
-
-    function onSaveError(err) {
-      const btn = document.getElementById('btnSubmit');
-      const spinner = document.getElementById('btnSpinner');
-      const btnText = document.getElementById('btnText');
-
-      btn.disabled = false;
-      spinner.style.display = 'none';
-      btnText.textContent = '💾 Lưu Thông Tin';
-
-      showAlert('error', `
-        <b>Không thể gửi dữ liệu vào Google Sheet!</b><br>
-        Vui lòng kiểm tra lại link Web App trong phần cài đặt (bánh răng ⚙️).
-      `);
     }
 
     function escapeHtml(str) {
