@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhập Thông Tin Khách Hàng - CRM Đơn Hàng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #c2881e;
+      --primary-dark: #9d6d13;
+      --primary-light: #fff9ed;
+      --primary-border: #f2dcab;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --focus-ring: rgba(194, 136, 30, 0.25);
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --success-text: #065f46;
+      --error-bg: #fef2f2;
+      --error-border: #fecaca;
+      --error-text: #991b1b;
+      --radius: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2f6 100%);
+      color: var(--text);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08), 0 10px 15px -8px rgba(0, 0, 0, 0.04);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Top bar buttons (Config / Settings) */
+    .top-actions {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--primary-border);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: var(--transition);
+      color: var(--primary-dark);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .btn-icon:hover {
+      background: #ffffff;
+      transform: scale(1.08);
+    }
+
+    /* Header */
+    .form-header {
+      background: linear-gradient(135deg, #fdf7ec 0%, #fae8c4 100%);
+      padding: 24px 20px 18px;
+      border-bottom: 2px solid var(--primary-border);
+      text-align: center;
+    }
+
+    .form-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #783f04;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .live-clock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 4px 14px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #92400e;
+      font-weight: 600;
+      border: 1px solid rgba(194, 136, 30, 0.35);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Form Body */
+    .form-body {
+      padding: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-label span.req {
+      color: #ef4444;
+      margin-left: 2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 11px 14px 11px 42px;
+      font-size: 0.94rem;
+      color: var(--text);
+      background-color: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3.5px var(--focus-ring);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 70px;
+      padding-top: 10px;
+    }
+
+    /* Buttons */
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-submit {
+      flex: 2;
+      background: linear-gradient(135deg, #d99b26 0%, #b87a14 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(184, 122, 20, 0.3);
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: linear-gradient(135deg, #c78b1d 0%, #a3690d 100%);
+      box-shadow: 0 6px 18px rgba(184, 122, 20, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .btn-reset {
+      flex: 1;
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid var(--border);
+    }
+
+    .btn-reset:hover {
+      background-color: #e2e8f0;
+      color: #1e293b;
+    }
+
+    /* Alert Banner */
+    .alert {
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert.success {
+      background-color: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+      display: flex;
+    }
+
+    .alert.error {
+      background-color: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+      display: flex;
+    }
+
+    /* Last saved card */
+    .last-saved-card {
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: #fafaf9;
+      border: 1px dashed #d6d3d1;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      display: none;
+    }
+
+    .last-saved-card.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .last-saved-title {
+      font-weight: 700;
+      color: #78350f;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hint {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Settings Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      padding: 22px;
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .guide-steps {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: #475569;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .guide-steps ol {
+      padding-left: 18px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    .status-badge.connected {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.74rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <!-- Top Action: Settings Button -->
+    <div class="top-actions">
+      <button class="btn-icon" title="Cài đặt kết nối Google Sheet" onclick="openConfigModal()">
+        ⚙️
+      </button>
+    </div>
+
+    <!-- Header -->
+    <div class="form-header">
+      <h2><span>📋</span> Nhập Dữ Liệu Khách Hàng</h2>
+      <div class="live-clock-badge">
+        <span class="live-dot"></span>
+        <span id="liveClock">Đang tải giờ...</span>
+      </div>
+      <div>
+        <span id="connectionBadge" class="status-badge">
+          <span>⚪</span> Chưa cấu hình Sheet
+        </span>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="form-body">
+      <div id="alertBox" class="alert">
+        <span id="alertIcon"></span>
+        <span id="alertMessage"></span>
+      </div>
+
+      <form id="customerForm" onsubmit="handleSubmit(event)">
+        <!-- Khách hàng -->
+        <div class="form-group">
+          <label class="form-label" for="khachHang">
+            Khách Hàng <span class="req">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input 
+              type="text" 
+              id="khachHang" 
+              class="form-control" 
+              placeholder="VD: Nguyễn Văn A" 
+              required 
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- SĐT -->
+        <div class="form-group">
+          <label class="form-label" for="sdt">
+            Số Điện Thoại <span class="req">*</span>
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">📞</span>
+            <input 
+              type="tel" 
+              id="sdt" 
+              class="form-control" 
+              placeholder="VD: 0987654321" 
+              required 
+              pattern="[0-9]{9,11}" 
+              title="Vui lòng nhập 9 đến 11 chữ số" 
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Sản phẩm khách xem -->
+        <div class="form-group">
+          <label class="form-label" for="sanPham">
+            Sản Phẩm Khách Xem
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon" style="top: 12px;">🏷️</span>
+            <textarea 
+              id="sanPham" 
+              class="form-control" 
+              rows="2" 
+              placeholder="VD: Áo sơ mi nam size L..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Nhân viên -->
+        <div class="form-group">
+          <label class="form-label" for="nhanVien">
+            Nhân Viên Phụ Trách
+          </label>
+          <div class="input-wrapper">
+            <span class="input-icon">👔</span>
+            <input 
+              type="text" 
+              id="nhanVien" 
+              class="form-control" 
+              placeholder="VD: Lan Anh" 
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="button-group">
+          <button type="button" class="btn btn-reset" onclick="resetForm()">
+            🔄 Làm Mới
+          </button>
+          <button type="submit" id="btnSubmit" class="btn btn-submit">
+            <span class="spinner" id="btnSpinner"></span>
+            <span id="btnText">💾 Lưu Thông Tin</span>
+          </button>
+        </div>
+
+        <div class="hint">
+          Mẹo: Nhấn <b>Enter</b> hoặc <b>Ctrl + Enter</b> để lưu nhanh
+        </div>
+      </form>
+
+      <!-- Last Saved Summary -->
+      <div id="lastSavedCard" class="last-saved-card">
+        <div class="last-saved-title">
+          <span>✅</span> Vừa lưu thành công vào Sheet:
+        </div>
+        <div id="lastSavedContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    CRM Đơn Hàng • Tự động ghi nhận ngày giờ & STT
+  </div>
+
+  <!-- Modal Cấu hình Web App Google Sheet -->
+  <div id="configModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>⚙️</span> Cài Đặt Kết Nối Google Sheet
+      </div>
+      <p class="modal-desc">
+        Dán đường link <b>Web App Google Apps Script</b> của trang tính vào đây để form trên GitHub lưu dữ liệu trực tiếp vào Google Sheet của bạn.
+      </p>
+
+      <div class="guide-steps">
+        <b>Cách lấy link Web App (chỉ cần làm 1 lần):</b>
+        <ol>
+          <li>Mở Google Sheet ➔ <b>Tiện ích mở rộng</b> ➔ <b>Apps Script</b>.</li>
+          <li>Góc trên bên phải, bấm nút xanh <b>Triển khai</b> ➔ <b>Triển khai mới</b>.</li>
+          <li>Chọn loại: <b>Ứng dụng web</b>. Mục <i>Ai có quyền truy cập</i> chọn: <b>Bất kỳ ai (Anyone)</b>.</li>
+          <li>Bấm <b>Triển khai</b> và sao chép <b>URL ứng dụng web</b> (dạng: <code>https://script.google.com/macros/s/.../exec</code>).</li>
+        </ol>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="gasUrlInput">URL Web App Google Apps Script:</label>
+        <input 
+          type="url" 
+          id="gasUrlInput" 
+          class="form-control" 
+          style="padding-left: 12px;" 
+          placeholder="https://script.google.com/macros/s/.../exec"
+        />
+      </div>
+
+      <div class="button-group" style="margin-top: 14px;">
+        <button type="button" class="btn btn-reset" onclick="closeConfigModal()">
+          Đóng
+        </button>
+        <button type="button" class="btn btn-submit" onclick="saveGasUrl()">
+          💾 Lưu Cấu Hình
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'crm_donhang_gas_url';
+
+    // 1. Đồng hồ thời gian thực
+    function updateClock() {
+      const now = new Date();
+      const options = { 
+        timeZone: 'Asia/Ho_Chi_Minh', 
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit', second: '2-digit', 
+        hour12: false 
+      };
+      document.getElementById('liveClock').textContent = new Intl.DateTimeFormat('vi-VN', options).format(now);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 2. Khởi tạo trạng thái kết nối
+    window.addEventListener('DOMContentLoaded', () => {
+      checkConnectionStatus();
+      document.getElementById('khachHang').focus();
+    });
+
+    function getScriptUrl() {
+      return localStorage.getItem(STORAGE_KEY) || '';
+    }
+
+    function checkConnectionStatus() {
+      const url = getScriptUrl();
+      const badge = document.getElementById('connectionBadge');
+      if (url && url.includes('script.google.com')) {
+        badge.className = 'status-badge connected';
+        badge.innerHTML = '<span>🟢</span> Đã kết nối Google Sheet';
+      } else {
+        badge.className = 'status-badge';
+        badge.innerHTML = '<span>⚪</span> Chưa kết nối Google Sheet';
+      }
+    }
+
+    function openConfigModal() {
+      document.getElementById('gasUrlInput').value = getScriptUrl();
+      document.getElementById('configModal').style.display = 'flex';
+    }
+
+    function closeConfigModal() {
+      document.getElementById('configModal').style.display = 'none';
+    }
+
+    function saveGasUrl() {
+      const val = document.getElementById('gasUrlInput').value.trim();
+      if (!val) {
+        alert('Vui lòng nhập đường dẫn URL Web App!');
+        return;
+      }
+      if (!val.startsWith('https://script.google.com/macros/s/')) {
+        alert('Đường dẫn chưa đúng định dạng. Phải bắt đầu bằng: https://script.google.com/macros/s/...');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEY, val);
+      checkConnectionStatus();
+      closeConfigModal();
+      showAlert('success', 'Đã lưu cấu hình kết nối Google Sheet!');
+    }
+
+    // 3. Phím tắt
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const form = document.getElementById('customerForm');
+        if (form.checkValidity()) handleSubmit(e);
+        else form.reportValidity();
+      }
+    });
+
+    function showAlert(type, message) {
+      const box = document.getElementById('alertBox');
+      box.className = 'alert ' + type;
+      document.getElementById('alertIcon').textContent = type === 'success' ? '✅' : '⚠️';
+      document.getElementById('alertMessage').textContent = message;
+      if (type === 'success') {
+        setTimeout(() => { box.style.display = 'none'; }, 4500);
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('customerForm').reset();
+      document.getElementById('alertBox').style.display = 'none';
+      document.getElementById('khachHang').focus();
+    }
+
+    // 4. Xử lý Gửi Dữ Liệu
+    async function handleSubmit(e) {
+      if (e) e.preventDefault();
+
+      const khachHang = document.getElementById('khachHang').value.trim();
+      const sdt = document.getElementById('sdt').value.trim();
+      const sanPham = document.getElementById('sanPham').value.trim();
+      const nhanVien = document.getElementById('nhanVien').value.trim();
+
+      if (!khachHang || !sdt) {
+        showAlert('error', 'Vui lòng điền đủ Tên Khách Hàng và Số Điện Thoại!');
+        return;
+      }
+
+      const scriptUrl = getScriptUrl();
+
+      // Kiểm tra nếu chưa cấu hình URL trên GitHub Pages
+      if (!scriptUrl && (typeof google === 'undefined' || !google.script)) {
+        openConfigModal();
+        showAlert('error', 'Vui lòng dán link Web App Google Apps Script để kết nối với Google Sheet!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmit');
+      const spinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+
+      btn.disabled = true;
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Đang lưu vào Sheet...';
+
+      const payload = { khachHang, sdt, sanPham, nhanVien };
+
+      // Trường hợp 1: Chạy trực tiếp trong Google Apps Script (Sidebar/Dialog)
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(onSaveSuccess)
+          .withFailureHandler(onSaveError)
+          .saveCustomerData(payload);
+        return;
+      }
+
+      // Trường hợp 2: Chạy trên GitHub Pages (Gửi qua Webhook POST tới Google Apps Script)
+      try {
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        onSaveSuccess(result);
+      } catch (err) {
+        // Dự phòng: một số trình duyệt chặn CORS ở chế độ POST, thử gửi qua GET fallback
+        try {
+          const params = new URLSearchParams(payload).toString();
+          const fallbackUrl = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + params;
+          const fallbackRes = await fetch(fallbackUrl);
+          const fallbackJson = await fallbackRes.json();
+          onSaveSuccess(fallbackJson);
+        } catch (fallbackErr) {
+          onSaveError(err);
+        }
+      }
+    }
+
+    function onSaveSuccess(response) {
+      const btn = document.getElementById('btnSubmit');
+      const spinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '💾 Lưu Thông Tin';
+
+      if (response && response.success) {
+        showAlert('success', response.message);
+        
+        document.getElementById('lastSavedContent').innerHTML = `
+          <b>#${response.data.stt}:</b> ${escapeHtml(response.data.khachHang)} (${escapeHtml(response.data.sdt)})<br>
+          <b>Sản phẩm:</b> ${escapeHtml(response.data.sanPham || '---')} | <b>Nhân viên:</b> ${escapeHtml(response.data.nhanVien || '---')}<br>
+          <i>🕒 ${response.data.thoiGian}</i>
+        `;
+        document.getElementById('lastSavedCard').classList.add('active');
+
+        // Giữ lại tên nhân viên cho khách kế tiếp
+        const nv = document.getElementById('nhanVien').value;
+        document.getElementById('customerForm').reset();
+        document.getElementById('nhanVien').value = nv;
+        document.getElementById('khachHang').focus();
+      } else {
+        showAlert('error', response ? response.message : 'Có lỗi khi lưu vào Sheet!');
+      }
+    }
+
+    function onSaveError(err) {
+      const btn = document.getElementById('btnSubmit');
+      const spinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '💾 Lưu Thông Tin';
+      showAlert('error', 'Lỗi kết nối tới Google Sheet: ' + err.toString());
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
