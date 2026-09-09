@@ -340,10 +340,6 @@
       box-shadow: 0 4px 12px rgba(22, 163, 74, 0.16);
     }
 
-    .view-result-btn:active {
-      transform: translateY(0);
-    }
-
     /* THÔNG BÁO GIỮA MÀN HÌNH ĐÚNG 5 GIÂY */
     .center-toast-overlay {
       position: fixed;
@@ -441,7 +437,6 @@
 <body>
 
   <div class="form-container">
-    <!-- Header (Nhấp đúp vào tiêu đề nếu cần đổi link) -->
     <div class="form-header">
       <h2 title="Nhấp đúp để cài đặt kết nối" ondblclick="openConfigModal()">
         <span>📋</span> Nhập Dữ Liệu Khách Hàng
@@ -575,7 +570,7 @@
     </div>
   </div>
 
-  <!-- Modal Cài Đặt Kết Nối (Ẩn - Chỉ mở khi nhấp đúp tiêu đề) -->
+  <!-- Modal Cài Đặt Kết Nối (Ẩn - Nhấp đúp tiêu đề để mở) -->
   <div id="configModal" class="modal-backdrop">
     <div class="modal-card">
       <h3 style="margin-bottom: 8px; color: #1e293b;">⚙️ Cài Đặt Link Google Sheet</h3>
@@ -607,6 +602,18 @@
   </div>
 
   <script>
+    // =========================================================================
+    // CẤU HÌNH CỐ ĐỊNH CHO TẤT CẢ MỌI TRÌNH DUYỆT & MỌI NGƯỜI DÙNG
+    // Khi điền link vào đây, bất kỳ ai mở web ở bất cứ đâu đều chạy ngay,
+    // KHÔNG BAO GIỜ bị hỏi nhập lại link nữa!
+    // =========================================================================
+    const APP_CONFIG = {
+      // Dán URL Web App Google Apps Script của bạn vào đây:
+      SCRIPT_URL: '',
+      // Dán link Trang tính Google Sheets của bạn vào đây:
+      SHEET_URL: ''
+    };
+
     const STORAGE_KEY = 'crm_donhang_gas_url';
     const STAFF_STORAGE_KEY = 'crm_staff_list';
     const SHEET_DIRECT_KEY = 'crm_sheet_direct_url';
@@ -645,12 +652,18 @@
       }
     });
 
+    // Lấy URL Web App (ưu tiên APP_CONFIG cố định, nếu trống mới lấy localStorage)
     function getScriptUrl() {
-      return localStorage.getItem(STORAGE_KEY) || '';
+      return (APP_CONFIG.SCRIPT_URL && APP_CONFIG.SCRIPT_URL.trim()) 
+          || localStorage.getItem(STORAGE_KEY) 
+          || '';
     }
 
+    // Lấy URL Trang Tính (ưu tiên APP_CONFIG cố định, nếu trống mới lấy localStorage)
     function getSheetDirectUrl() {
-      return localStorage.getItem(SHEET_DIRECT_KEY) || '';
+      return (APP_CONFIG.SHEET_URL && APP_CONFIG.SHEET_URL.trim()) 
+          || localStorage.getItem(SHEET_DIRECT_KEY) 
+          || '';
     }
 
     // Mở trang tính Google Sheets khi bấm "Xem kết quả"
@@ -662,12 +675,8 @@
         return;
       }
 
-      // Nếu chưa có sẵn link, hỏi người dùng dán 1 lần
-      const input = prompt('Nhập link Google Sheet của bạn để mở trực tiếp:', '');
-      if (input && input.trim()) {
-        localStorage.setItem(SHEET_DIRECT_KEY, input.trim());
-        window.open(input.trim(), '_blank');
-      }
+      // Nếu chưa cấu hình cố định trong code và chưa lưu máy, mở popup cài đặt
+      openConfigModal();
     }
 
     function openConfigModal() {
@@ -702,7 +711,7 @@
       window[callbackName] = function(res) {
         delete window[callbackName];
         if (res) {
-          if (res.sheetUrl) {
+          if (res.sheetUrl && !getSheetDirectUrl()) {
             localStorage.setItem(SHEET_DIRECT_KEY, res.sheetUrl);
           }
           if (res.success && res.staff) {
@@ -857,7 +866,7 @@
       const scriptUrl = getScriptUrl();
       if (!scriptUrl) {
         openConfigModal();
-        alert('Vui lòng dán link Web App Google Apps Script để kết nối!');
+        alert('Vui lòng cài đặt link Web App Google Apps Script!');
         return;
       }
 
