@@ -1,7 +1,7 @@
 /**
  * =========================================================================================
  * BẢN TẤT CẢ TRONG 1 (ALL-IN-ONE): GOOGLE APPS SCRIPT FORM NHẬP LIỆU KHÁCH HÀNG KÈM NGÀY GIỜ
- * TỐI ƯU TỐC ĐỘ LƯU CỰC NHANH (SIÊU TỐC) + GỢI Ý NHÂN VIÊN TỪ TAB "DS NHÂN VIÊN"
+ * TỐI ƯU SIÊU TỐC + GỢI Ý NHÂN VIÊN + TỰ ĐỘNG CUNG CẤP LINK XEM TRANG TÍNH GOOGLE SHEETS
  * =========================================================================================
  */
 
@@ -39,27 +39,32 @@ function showModalDialog() {
  * Xử lý yêu cầu GET từ Web ngoài (GitHub Pages) hoặc mở Web App trực tiếp
  */
 function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetUrl = ss.getUrl();
+
   // 1. Kiểm tra kết nối (Ping Test)
   if (e && e.parameter && e.parameter.action === "ping") {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = (SHEET_NAME && SHEET_NAME.trim() !== "") ? ss.getSheetByName(SHEET_NAME.trim()) : ss.getSheets()[0];
     const pingResult = {
       success: true,
       message: "Kết nối thành công tới Google Sheet!",
+      sheetUrl: sheetUrl,
       sheetName: sheet ? sheet.getName() : "Sheet1"
     };
     return createJsonResponse(pingResult, e.parameter.callback);
   }
 
-  // 2. Lấy danh sách nhân viên từ tab "ds nhân viên" để gợi ý
+  // 2. Lấy danh sách nhân viên từ tab "ds nhân viên" để gợi ý + trả về sheetUrl
   if (e && e.parameter && e.parameter.action === "getStaff") {
     const staffResult = getStaffList();
+    staffResult.sheetUrl = sheetUrl;
     return createJsonResponse(staffResult, e.parameter.callback);
   }
 
   // 3. Nhận dữ liệu gửi qua GET từ GitHub Pages (nếu có)
   if (e && e.parameter && (e.parameter.khachHang || e.parameter.sdt)) {
     const result = saveCustomerData(e.parameter);
+    result.sheetUrl = sheetUrl;
     return createJsonResponse(result, e.parameter.callback);
   }
 
@@ -75,6 +80,9 @@ function doGet(e) {
  */
 function doPost(e) {
   try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheetUrl = ss.getUrl();
+
     let data = {};
     if (e.parameter && (e.parameter.khachHang || e.parameter.sdt)) {
       data = e.parameter;
@@ -87,6 +95,7 @@ function doPost(e) {
     }
 
     const result = saveCustomerData(data);
+    result.sheetUrl = sheetUrl;
     return createJsonResponse(result, e.parameter ? e.parameter.callback : null);
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -185,7 +194,7 @@ function showHelp() {
 }
 
 /**
- * Hàm ghi dữ liệu vào Google Sheet - Tối ưu 1 lệnh RPC duy nhất
+ * Hàm ghi dữ liệu vào Google Sheet
  */
 function saveCustomerData(data) {
   try {

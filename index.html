@@ -58,7 +58,7 @@
       position: relative;
     }
 
-    /* Ẩn hoàn toàn nút bánh răng theo yêu cầu */
+    /* Ẩn hoàn toàn nút bánh răng */
     .top-actions {
       display: none !important;
     }
@@ -308,9 +308,43 @@
       color: var(--text-muted);
     }
 
-    /* ===================================================
-       THÔNG BÁO GIỮA MÀN HÌNH (CENTER TOAST MODAL)
-       =================================================== */
+    /* Dòng 'Xem kết quả' mở trang tính */
+    .view-result-box {
+      text-align: center;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed #e2e8f0;
+    }
+
+    .view-result-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      color: #15803d;
+      border: 1.5px solid #86efac;
+      border-radius: 30px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.08);
+    }
+
+    .view-result-btn:hover {
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      color: #166534;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.16);
+    }
+
+    .view-result-btn:active {
+      transform: translateY(0);
+    }
+
+    /* THÔNG BÁO GIỮA MÀN HÌNH ĐÚNG 5 GIÂY */
     .center-toast-overlay {
       position: fixed;
       inset: 0;
@@ -374,7 +408,7 @@
       margin-top: 8px;
     }
 
-    /* Modal Cài Đặt Ẩn (Mở bằng cách nhấp đúp vào Tiêu đề) */
+    /* Modal Cài Đặt Ẩn */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -407,7 +441,7 @@
 <body>
 
   <div class="form-container">
-    <!-- Header (Nhấp đúp vào tiêu đề nếu cần cài đặt lại link Sheet) -->
+    <!-- Header (Nhấp đúp vào tiêu đề nếu cần đổi link) -->
     <div class="form-header">
       <h2 title="Nhấp đúp để cài đặt kết nối" ondblclick="openConfigModal()">
         <span>📋</span> Nhập Dữ Liệu Khách Hàng
@@ -475,7 +509,7 @@
           </div>
         </div>
 
-        <!-- 4. Nhân viên phụ trách (Có gợi ý tên từ tab 'ds nhân viên') -->
+        <!-- 4. Nhân viên phụ trách (Gợi ý tên từ tab 'ds nhân viên') -->
         <div class="form-group">
           <label class="form-label" for="nhanVien">
             Nhân Viên Phụ Trách
@@ -493,9 +527,7 @@
               onblur="handleStaffBlur()"
             />
           </div>
-          <!-- Gợi ý danh sách nhân viên -->
           <div id="staffSuggestions" class="suggestions-box"></div>
-          <!-- Ghi chú khi khớp nhân viên -->
           <div id="staffMatchNote" class="staff-match-note">
             <span>👤</span> <span id="staffMatchText"></span>
           </div>
@@ -515,6 +547,13 @@
         <div class="hint">
           Mẹo: Nhấn <b>Enter</b> hoặc <b>Ctrl + Enter</b> để lưu nhanh
         </div>
+
+        <!-- DÒNG "XEM KẾT QUẢ" MỞ TRANG TÍNH GOOGLE SHEETS -->
+        <div class="view-result-box">
+          <a href="javascript:void(0)" class="view-result-btn" onclick="openGoogleSheet(event)" title="Mở trang tính Google Sheets trong tab mới">
+            <span>📊</span> Xem Kết Quả (Trang Tính) <span style="font-size: 0.85rem;">↗</span>
+          </a>
+        </div>
       </form>
     </div>
   </div>
@@ -523,9 +562,7 @@
     CRM Đơn Hàng • Tự động ghi nhận ngày giờ & STT
   </div>
 
-  <!-- =====================================================
-       THÔNG BÁO HIỆN CHÍNH GIỮA MÀN HÌNH 5 GIÂY RỒI BIẾN MẤT
-       ===================================================== -->
+  <!-- Thông báo nổi giữa màn hình 5 giây -->
   <div id="centerToast" class="center-toast-overlay" onclick="hideCenterToast()">
     <div class="center-toast-card">
       <div class="toast-icon">✅</div>
@@ -533,7 +570,7 @@
         Đã lưu thành công!
       </div>
       <div class="toast-subtext">
-        (Tự động đóng sau 5 giây hoặc bấm vào để đóng)
+        (Tự động đóng sau 5 giây hoặc bấm để đóng)
       </div>
     </div>
   </div>
@@ -543,7 +580,7 @@
     <div class="modal-card">
       <h3 style="margin-bottom: 8px; color: #1e293b;">⚙️ Cài Đặt Link Google Sheet</h3>
       <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">
-        Dán URL Web App Google Apps Script để kết nối:
+        1. URL Web App Google Apps Script:
       </p>
       <input 
         type="url" 
@@ -551,6 +588,16 @@
         class="form-control" 
         style="padding-left: 12px; margin-bottom: 12px;" 
         placeholder="https://script.google.com/macros/s/.../exec"
+      />
+      <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 12px;">
+        2. Link Trang Tính Google Sheets (để mở khi bấm "Xem kết quả"):
+      </p>
+      <input 
+        type="url" 
+        id="sheetDirectUrlInput" 
+        class="form-control" 
+        style="padding-left: 12px; margin-bottom: 14px;" 
+        placeholder="https://docs.google.com/spreadsheets/d/.../edit"
       />
       <div class="button-group">
         <button type="button" class="btn btn-reset" onclick="closeConfigModal()">Đóng</button>
@@ -562,6 +609,7 @@
   <script>
     const STORAGE_KEY = 'crm_donhang_gas_url';
     const STAFF_STORAGE_KEY = 'crm_staff_list';
+    const SHEET_DIRECT_KEY = 'crm_sheet_direct_url';
     let staffList = [];
     let toastTimer = null;
 
@@ -601,8 +649,30 @@
       return localStorage.getItem(STORAGE_KEY) || '';
     }
 
+    function getSheetDirectUrl() {
+      return localStorage.getItem(SHEET_DIRECT_KEY) || '';
+    }
+
+    // Mở trang tính Google Sheets khi bấm "Xem kết quả"
+    function openGoogleSheet(e) {
+      if (e) e.preventDefault();
+      let url = getSheetDirectUrl();
+      if (url && url.startsWith('http')) {
+        window.open(url, '_blank');
+        return;
+      }
+
+      // Nếu chưa có sẵn link, hỏi người dùng dán 1 lần
+      const input = prompt('Nhập link Google Sheet của bạn để mở trực tiếp:', '');
+      if (input && input.trim()) {
+        localStorage.setItem(SHEET_DIRECT_KEY, input.trim());
+        window.open(input.trim(), '_blank');
+      }
+    }
+
     function openConfigModal() {
       document.getElementById('gasUrlInput').value = getScriptUrl();
+      document.getElementById('sheetDirectUrlInput').value = getSheetDirectUrl();
       document.getElementById('configModal').style.display = 'flex';
     }
 
@@ -612,14 +682,18 @@
 
     function saveGasUrl() {
       const val = document.getElementById('gasUrlInput').value.trim();
+      const directUrl = document.getElementById('sheetDirectUrlInput').value.trim();
+
       if (!val) { alert('Vui lòng nhập URL Web App!'); return; }
       localStorage.setItem(STORAGE_KEY, val);
+      if (directUrl) localStorage.setItem(SHEET_DIRECT_KEY, directUrl);
+
       closeConfigModal();
-      showCenterToast('Đã lưu cấu hình kết nối Google Sheet!');
+      showCenterToast('Đã lưu cấu hình kết nối!');
       fetchStaffList();
     }
 
-    // Tải danh sách nhân viên từ tab "ds nhân viên"
+    // Tải danh sách nhân viên từ tab "ds nhân viên" và tự động lấy link Google Sheet
     function fetchStaffList() {
       const scriptUrl = getScriptUrl();
       if (!scriptUrl) return;
@@ -627,9 +701,14 @@
       const callbackName = 'staff_cb_' + Math.round(100000 * Math.random());
       window[callbackName] = function(res) {
         delete window[callbackName];
-        if (res && res.success && res.staff) {
-          staffList = res.staff;
-          try { localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList)); } catch(e) {}
+        if (res) {
+          if (res.sheetUrl) {
+            localStorage.setItem(SHEET_DIRECT_KEY, res.sheetUrl);
+          }
+          if (res.success && res.staff) {
+            staffList = res.staff;
+            try { localStorage.setItem(STAFF_STORAGE_KEY, JSON.stringify(staffList)); } catch(e) {}
+          }
         }
       };
 
@@ -638,7 +717,7 @@
       document.body.appendChild(script);
     }
 
-    // Xử lý gợi ý Nhân Viên khi người dùng nhập
+    // Gợi ý Nhân Viên khi người dùng nhập
     function handleStaffInput(val) {
       const q = val.trim().toLowerCase();
       const box = document.getElementById('staffSuggestions');
@@ -716,7 +795,7 @@
       document.getElementById('staffMatchText').textContent = `Khớp nhân viên: ${item.name} (${item.user || ''})`;
     }
 
-    // Phím tắt Enter lưu nhanh
+    // Phím tắt Enter
     document.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         const form = document.getElementById('customerForm');
@@ -725,7 +804,7 @@
       }
     });
 
-    // HIỂN THỊ THÔNG BÁO GIỮA MÀN HÌNH ĐÚNG 5 GIÂY RỒI BIẾN MẤT
+    // Thông báo nổi giữa màn hình đúng 5 giây
     function showCenterToast(message) {
       const toast = document.getElementById('centerToast');
       const msg = document.getElementById('centerToastMessage');
@@ -735,7 +814,7 @@
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
         hideCenterToast();
-      }, 5000); // 5 giây
+      }, 5000);
     }
 
     function hideCenterToast() {
@@ -754,7 +833,7 @@
       document.getElementById('khachHang').focus();
     }
 
-    // 3. TỐI ƯU TỐC ĐỘ LƯU DỮ LIỆU SIÊU TỐC (DƯỚI 1 GIÂY)
+    // Xử lý Lưu Thông Tin siêu tốc
     async function handleSubmit(e) {
       if (e) e.preventDefault();
 
@@ -792,7 +871,6 @@
 
       const payload = { khachHang, sdt, sanPham, nhanVien };
 
-      // Gửi trực tiếp siêu tốc bằng no-cors POST (thực thi ngay lập tức ~0.4s)
       try {
         await fetch(scriptUrl, {
           method: 'POST',
@@ -804,15 +882,11 @@
           body: new URLSearchParams(payload).toString()
         });
 
-        // Hoàn tất lưu
         btn.disabled = false;
         spinner.style.display = 'none';
         btnText.textContent = '💾 Lưu Thông Tin';
 
-        // 1. Hiện thông báo giữa màn hình đúng 5 giây
         showCenterToast(`Đã lưu thành công khách hàng:<br><b>${escapeHtml(khachHang)}</b>`);
-
-        // 2. Reset tất cả các ô thành trống ngay lập tức
         resetForm();
 
       } catch (err) {
